@@ -1,0 +1,660 @@
+% This file was created with JabRef 2.10.
+% Encoding: GBK
+
+
+@Article{classificationBFHi,
+  Title                    = {Hierarchical packet classification using a Bloom filter and rule-priority tries},
+  Author                   = {Alagu Priya, AG and Lim, Hyesook},
+  Journal                  = {Computer Communications},
+  Year                     = {2010},
+  Number                   = {10},
+  Pages                    = {1215--1226},
+  Volume                   = {33},
+
+  Publisher                = {Elsevier}
+}
+
+@InProceedings{BFwirelessNDN,
+  Title                    = {BLOOGO: BLOOm filter based GOssip algorithm for wireless NDN},
+  Author                   = {Angius, Fabio and Gerla, Mario and Pau, Giovanni},
+  Booktitle                = {Proceedings of the 1st ACM workshop on Emerging Name-Oriented Mobile Networking Design-Architecture, Algorithms, and Applications},
+  Year                     = {2012},
+  Organization             = {ACM},
+  Pages                    = {25--30}
+}
+
+@InCollection{CHD,
+  Title                    = {Hash, displace, and compress},
+  Author                   = {Belazzougui, Djamal and Botelho, Fabiano C and Dietzfelbinger, Martin},
+  Booktitle                = {Algorithms-ESA 2009},
+  Publisher                = {Springer},
+  Year                     = {2009},
+  Pages                    = {682--693}
+}
+
+@Article{encrypt,
+  Title                    = {Privacy-enhanced searches using encrypted bloom filters},
+  Author                   = {Bellovin, Steven Michael and Cheswick, William R},
+  Year                     = {2007},
+
+  Publisher                = {Department of Computer Science, Columbia University}
+}
+
+@Article{BF1970,
+  Title                    = {Space/time trade-offs in hash coding with allowable errors},
+  Author                   = {Bloom, Burton H},
+  Journal                  = {Communications of the ACM},
+  Year                     = {1970},
+  Number                   = {7},
+  Pages                    = {422--426},
+  Volume                   = {13},
+
+  Publisher                = {ACM}
+}
+
+@Article{Sig06bBF,
+  Title                    = {Beyond bloom filters: from approximate membership checks to approximate state machines},
+  Author                   = {Bonomi, Flavio and Mitzenmacher, Michael and Panigrah, Rina and Singh, Sushil and Varghese, George},
+  Journal                  = {ACM SIGCOMM Computer Communication Review},
+  Year                     = {2006},
+  Number                   = {4},
+  Pages                    = {315--326},
+  Volume                   = {36},
+
+  Publisher                = {ACM}
+}
+
+@InProceedings{dleft,
+  Title                    = {Bloom Filters via d-Left Hashing and Dynamic Bit Reassignment Extended Abstract},
+  Author                   = {Bonomi, Flavio and Mitzenmacher, Michael and Panigraphy, Rina and Singh, Sushil and Varghese, George},
+  Booktitle                = {Forty-Fourth Annual Allerton Conf., Illinois, USA},
+  Year                     = {2006},
+  Pages                    = {877--883}
+}
+
+@Article{bose2008false,
+  Title                    = {On the false-positive rate of Bloom filters},
+  Author                   = {Bose, Prosenjit and Guo, Hua and Kranakis, Evangelos and Maheshwari, Anil and Morin, Pat and Morrison, Jason and Smid, Michiel and Tang, Yihui},
+  Journal                  = {Information Processing Letters},
+  Year                     = {2008},
+  Number                   = {4},
+  Pages                    = {210--213},
+  Volume                   = {108},
+
+  Publisher                = {Elsevier}
+}
+
+@Article{entropy,
+  Title                    = {Science \& Information Theory},
+  Author                   = {Brillouin, L{e'}on},
+  Journal                  = {Dover Publications},
+  Year                     = {2004},
+  Pages                    = {293}
+}
+
+@Article{BFSurvey,
+  Title                    = {Network applications of bloom filters: A survey},
+  Author                   = {Broder, Andrei and Mitzenmacher, Michael},
+  Journal                  = {Internet Mathematics},
+  Year                     = {2004},
+  Number                   = {4},
+  Pages                    = {485--509},
+  Volume                   = {1},
+
+  Publisher                = {Taylor \& Francis}
+}
+
+@InProceedings{Sig02informed,
+  Title                    = {Informed content delivery across adaptive overlay networks},
+  Author                   = {Byers, John and Considine, Jeffrey and Mitzenmacher, Michael and Rost, Stanislav},
+  Booktitle                = {ACM SIGCOMM Computer Communication Review},
+  Year                     = {2002},
+  Number                   = {4},
+  Volume                   = {32}
+}
+
+@InProceedings{universalHash,
+  Title                    = {Universal classes of hash functions},
+  Author                   = {Carter, J Lawrence and Wegman, Mark N},
+  Booktitle                = {Proceedings of the ninth annual ACM symposium on Theory of computing},
+  Year                     = {1977},
+  Organization             = {ACM},
+  Pages                    = {106--112}
+}
+
+@InProceedings{Info04ACPC,
+  Title                    = {Approximate caches for packet classification},
+  Author                   = {Chang, Francis and Feng, Wu-chang and Li, Kang},
+  Booktitle                = {\Proc IEEE  INFOCOM},
+  Year                     = {2004}
+}
+
+@InProceedings{Bloomier,
+  Title                    = {The Bloomier filter: an efficient data structure for static support lookup tables},
+  Author                   = {Chazelle, Bernard and Kilian, Joe and Rubinfeld, Ronitt and Tal, Ayellet},
+  Booktitle                = {Proceedings of the fifteenth annual ACM-SIAM symposium on Discrete algorithms},
+  Year                     = {2004},
+  Organization             = {Society for Industrial and Applied Mathematics},
+  Pages                    = {30--39}
+}
+
+@Article{BFsetting12,
+  Title                    = {Optimizing bloom filter settings in peer-to-peer multikeyword searching},
+  Author                   = {Chen, Hanhua and Jin, Hai and Chen, Lei and Liu, Yunhao and Ni, Lionel M},
+  Journal                  = {Knowledge and Data Engineering, IEEE Transactions on},
+  Year                     = {2012},
+  Number                   = {4},
+  Pages                    = {692--706},
+  Volume                   = {24},
+
+  Publisher                = {IEEE}
+}
+
+@Article{ken2010false,
+  Title                    = {A new analysis of the false positive rate of a Bloom filter},
+  Author                   = {Christensen, Ken and Roginsky, Allen and Jimeno, Miguel},
+  Journal                  = {Information Processing Letters},
+  Year                     = {2010},
+  Number                   = {21},
+  Pages                    = {944--949},
+  Volume                   = {110},
+
+  Publisher                = {Elsevier}
+}
+
+@InProceedings{spectralBF,
+  Title                    = {Spectral bloom filters},
+  Author                   = {Cohen, Saar and Matias, Yossi},
+  Booktitle                = {\Proc ACM SIGMOD},
+  Year                     = {2003},
+  Organization             = {ACM},
+  Pages                    = {241--252}
+}
+
+@InProceedings{HPI03deep,
+  Title                    = {Deep packet inspection using parallel bloom filters},
+  Author                   = {Dharmapurikar, Sarang and Krishnamurthy, Praveen and Sproull, Todd and Lockwood, John},
+  Booktitle                = {\Proc IEEE HPI},
+  Year                     = {2003},
+  Organization             = {IEEE},
+  Pages                    = {44--51}
+}
+
+@InProceedings{sig03PBF,
+  Title                    = {Longest prefix matching using bloom filters},
+  Author                   = {Dharmapurikar, Sarang and Krishnamurthy, Praveen and Taylor, David E},
+  Booktitle                = {\Proc ACM SIGCOMM},
+  Year                     = {2003},
+  Organization             = {ACM},
+  Pages                    = {201--212}
+}
+
+@InProceedings{classificationBF,
+  Title                    = {Fast packet classification using bloom filters},
+  Author                   = {Dharmapurikar, Sarang and Song, Haoyu and Turner, Jonathan and Lockwood, John},
+  Booktitle                = {\Proc IEEE ANCS},
+  Year                     = {2006},
+  Organization             = {IEEE},
+  Pages                    = {61--70}
+}
+
+@InProceedings{retouchedBF,
+  Title                    = {Retouched Bloom filters: allowing networked applications to trade off selected false positives against false negatives},
+  Author                   = {Donnet, Benoit and Baynat, Bruno and Friedman, Timur},
+  Booktitle                = {\Proc ACM CoNext},
+  Year                     = {2006},
+  Organization             = {ACM},
+  Pages                    = {13}
+}
+
+@Book{Sig02new,
+  Title                    = {New directions in traffic measurement and accounting},
+  Author                   = {Estan, Cristian and Varghese, George},
+  Publisher                = {ACM},
+  Year                     = {2002},
+  Number                   = {4},
+  Volume                   = {32}
+}
+
+@Article{webcaching,
+  Title                    = {Summary cache: a scalable wide-area web cache sharing protocol},
+  Author                   = {Fan, Li and Cao, Pei and Almeida, Jussara and Broder, Andrei Z},
+  Journal                  = {IEEE/ACM Transactions on Networking (TON)},
+  Year                     = {2000},
+  Number                   = {3},
+  Pages                    = {281--293},
+  Volume                   = {8},
+
+  Publisher                = {IEEE Press}
+}
+
+@InProceedings{Info01SFB,
+  Title                    = {Stochastic fair blue: A queue management algorithm for enforcing fairness},
+  Author                   = {Feng, Wu-chang and Kandlur, Dilip D and Saha, Debanjan and Shin, Kang G},
+  Booktitle                = {\Proc IEEE  INFOCOM},
+  Year                     = {2001},
+  Organization             = {IEEE},
+  Pages                    = {1520--1529},
+  Volume                   = {3}
+}
+
+@InProceedings{setqueryBF,
+  Title                    = {Small subset queries and bloom filters using ternary associative memories, with applications},
+  Author                   = {Goel, Ashish and Gupta, Pankaj},
+  Booktitle                = {ACM SIGMETRICS Performance Evaluation Review},
+  Year                     = {2010},
+  Number                   = {1},
+  Organization             = {ACM},
+  Pages                    = {143--154},
+  Volume                   = {38}
+}
+
+@Article{DatabaseFile,
+  Title                    = {Designing a Bloom filter for differential file access},
+  Author                   = {Gremillion, Lee L},
+  Journal                  = {Communications of the ACM},
+  Year                     = {1982},
+  Number                   = {9},
+  Pages                    = {600--604},
+  Volume                   = {25},
+
+  Publisher                = {ACM}
+}
+
+@Article{Sig02Multicast,
+  Title                    = {Scalable multicast forwarding},
+  Author                   = {GrtinvaU, Bjtirn},
+  Journal                  = {SIGCOMM Computer Communications Review},
+  Year                     = {2002},
+  Number                   = {1},
+  Pages                    = {68--68},
+  Volume                   = {32}
+}
+
+@Article{falsenegative,
+  Title                    = {False negative problem of counting bloom filter},
+  Author                   = {Guo, Deke and Liu, Yunhao and Li, Xiangyang and Yang, Panlong},
+  Journal                  = {Knowledge and Data Engineering, IEEE Transactions on},
+  Year                     = {2010},
+  Number                   = {5},
+  Pages                    = {651--664},
+  Volume                   = {22},
+
+  Publisher                = {IEEE}
+}
+
+@Article{DynamicBF,
+  Title                    = {The dynamic bloom filters},
+  Author                   = {Guo, Deke and Wu, Jie and Chen, Honghui and Yuan, Ye and Luo, Xueshan},
+  Journal                  = {Knowledge and Data Engineering, IEEE Transactions on},
+  Year                     = {2010},
+  Number                   = {1},
+  Pages                    = {120--133},
+  Volume                   = {22},
+
+  Publisher                = {IEEE}
+}
+
+@InProceedings{partitionHashBF,
+  Title                    = {Building high accuracy bloom filters using partitioned hashing},
+  Author                   = {Hao, Fang and Kodialam, Murali and Lakshman, TV},
+  Booktitle                = {ACM SIGMETRICS Performance Evaluation Review},
+  Year                     = {2007},
+  Number                   = {1},
+  Organization             = {ACM},
+  Pages                    = {277--288},
+  Volume                   = {35}
+}
+
+@InProceedings{combineBF,
+  Title                    = {Fast multiset membership testing using combinatorial bloom filters},
+  Author                   = {Hao, Fang and Kodialam, Murali and Lakshman, TV and Song, Haoyu},
+  Booktitle                = {\Proc IEEE  INFOCOM},
+  Year                     = {2009},
+  Organization             = {IEEE},
+  Pages                    = {513--521}
+}
+
+@InProceedings{HASH-100G,
+  Title                    = {Ipv6 lookups using distributed and load balanced bloom filters for 100gbps core router line cards},
+  Author                   = {Song Haoyu and Hao Fang and Kodialam Murali and Lakshman TV},
+  Booktitle                = {\Proc IEEE INFOCOM},
+  Year                     = {2009},
+  Pages                    = {2518--2526}
+}
+
+@InCollection{lessHashBF,
+  Title                    = {Less hashing, same performance: building a better bloom filter},
+  Author                   = {Kirsch, Adam and Mitzenmacher, Michael},
+  Booktitle                = {Algorithms--ESA 2006},
+  Publisher                = {Springer},
+  Year                     = {2006},
+  Pages                    = {456--467}
+}
+
+@InCollection{BFSurvey9C,
+  Title                    = {Hash-based techniques for high-speed packet processing},
+  Author                   = {Kirsch, Adam and Mitzenmacher, Michael and Varghese, George},
+  Booktitle                = {Algorithms for Next Generation Networks},
+  Publisher                = {Springer},
+  Year                     = {2010},
+  Pages                    = {181--218}
+}
+
+@InCollection{OverlayMBF,
+  Title                    = {Content-based overlay networks for XML peers based on multi-level bloom filters},
+  Author                   = {Koloniari, Georgia and Petrakis, Yannis and Pitoura, Evaggelia},
+  Booktitle                = {Databases, Information Systems, and Peer-to-Peer Computing},
+  Publisher                = {Springer},
+  Year                     = {2004}
+}
+
+@InProceedings{CDNwww,
+  Title                    = {Scalable techniques for memory-efficient CDN simulations},
+  Author                   = {Kulkarni, Purushottam and Shenoy, Prashant and Gong, Weibo},
+  Booktitle                = {\Proc ACM WWW},
+  Year                     = {2003}
+}
+
+@Article{JSAC06measument,
+  Title                    = {Space-code bloom filter for efficient per-flow traffic measurement},
+  Author                   = {Kumar, Abhishek and Xu, Jun and Wang, Jia},
+  Journal                  = {Selected Areas in Communications, IEEE Journal on},
+  Year                     = {2006},
+  Number                   = {12},
+  Pages                    = {2327--2339},
+  Volume                   = {24},
+
+  Publisher                = {IEEE}
+}
+
+@InProceedings{ICC04scalable,
+  Title                    = {Scalable packet digesting schemes for IP traceback},
+  Author                   = {Lee, Tsern-Huei and Wu, Wei-Kai and Huang, T-YW},
+  Booktitle                = {\Proc IEEE ICC},
+  Year                     = {2004},
+  Organization             = {IEEE},
+  Pages                    = {1008--1013},
+  Volume                   = {2}
+}
+
+@InProceedings{BFDanLi,
+  Title                    = {Scalable data center multicast using multi-class bloom filter},
+  Author                   = {Li, Dan and Cui, Henggang and Hu, Yan and Xia, Yong and Wang, Xin},
+  Booktitle                = {\Proc IEEE ICNP},
+  Year                     = {2011},
+  Organization             = {IEEE},
+  Pages                    = {266--275}
+}
+
+@InProceedings{Info11DCN,
+  Title                    = {Exploring efficient and scalable multicast routing in future data center networks},
+  Author                   = {Li, Dan and Yu, Jiangwei and Yu, Junbiao and Wu, Jianping},
+  Booktitle                = {\Proc IEEE  INFOCOM},
+  Year                     = {2011},
+  Organization             = {IEEE},
+  Pages                    = {1368--1376}
+}
+
+@Article{CrossCheckBF,
+  Title                    = {Reducing False Positives of a Bloom Filter using Cross-Checking Bloom Filters},
+  Author                   = {Lim, Hyesook and Lee, Nara and Lee, Jungwon and Yim, Changhoon},
+  Journal                  = {Appl. Math},
+  Year                     = {2014},
+  Number                   = {4},
+  Pages                    = {1865--1877},
+  Volume                   = {8}
+}
+
+@Article{BF_TC,
+  Title                    = {On Adding Bloom Filters to Longest Prefix Matching Algorithms},
+  Author                   = {Hyesook Lim and Kyuhee Lim and Nara Lee and Kyong-Hye Park},
+  Journal                  = {IEEE Transactions on Computers (TC)},
+  Year                     = {2014},
+  Number                   = {2},
+  Pages                    = {411--423},
+  Volume                   = {63}
+}
+
+@InProceedings{IAWP2P,
+  Title                    = {Towards collaborative security and p2p intrusion detection},
+  Author                   = {Locasto, Michael E and Parekh, Janak J and Keromytis, Angelos D and Stolfo, Salvatore J},
+  Booktitle                = {\Proc IEEE  IAW},
+  Year                     = {2005},
+  Organization             = {IEEE},
+  Pages                    = {333--339}
+}
+
+@InProceedings{HardwareREM,
+  Title                    = {Internet worm and virus protection in dynamically reconfigurable hardware},
+  Author                   = {Lockwood, John W and Moscola, James and Kulig, Matthew and Reddick, David and Brooks, Tim},
+  Booktitle                = {Proceedings of the Military and Aerospace Programmable Logic Device Conference},
+  Year                     = {2003}
+}
+
+@InProceedings{IPSN07minisec,
+  Title                    = {MiniSec: a secure sensor network communication architecture},
+  Author                   = {Luk, Mark and Mezzour, Ghita and Perrig, Adrian and Gligor, Virgil},
+  Booktitle                = {Proceedings of the 6th international conference on Information processing in sensor networks},
+  Year                     = {2007},
+  Organization             = {ACM},
+  Pages                    = {479--488}
+}
+
+@Misc{compressedBFpatent,
+  Title                    = {Distributed, compressed Bloom filter Web cache server},
+
+  Author                   = {Mitzenmacher, Michael},
+  Month                    = jul # {~19},
+  Note                     = {US Patent 6,920,477},
+  Year                     = {2005},
+
+  Publisher                = {Google Patents}
+}
+
+@Article{compressedBF,
+  Title                    = {Compressed bloom filters},
+  Author                   = {Mitzenmacher, Michael},
+  Journal                  = {IEEE/ACM Transactions on Networking (TON)},
+  Year                     = {2002},
+  Number                   = {5},
+  Pages                    = {604--612},
+  Volume                   = {10},
+
+  Publisher                = {IEEE Press}
+}
+
+@InProceedings{CloudCom11ATree,
+  Title                    = {A-tree: Distributed indexing of multidimensional data for cloud computing environments},
+  Author                   = {Papadopoulos, Andreas and Katsaros, Dimitrios},
+  Booktitle                = {\Proc IEEE  CloudCom},
+  Year                     = {2011},
+  Organization             = {IEEE},
+  Pages                    = {407--414}
+}
+
+@InProceedings{onemem,
+  Title                    = {One memory access bloom filters and their generalization},
+  Author                   = {Qiao, Yan and Li, Tao and Chen, Shigang},
+  Booktitle                = {\Proc IEEE  INFOCOM},
+  Year                     = {2011},
+  Organization             = {IEEE},
+  Pages                    = {1745--1753}
+}
+
+@Article{DatabaseText,
+  Title                    = {Practical performance of Bloom filters and parallel free-text searching},
+  Author                   = {Ramakrishna, MV},
+  Journal                  = {Communications of the ACM},
+  Year                     = {1989},
+  Number                   = {10},
+  Pages                    = {1237--1239},
+  Volume                   = {32},
+
+  Publisher                = {ACM}
+}
+
+@InProceedings{P2Psearching,
+  Title                    = {Efficient peer-to-peer keyword searching},
+  Author                   = {Reynolds, Patrick and Vahdat, Amin},
+  Booktitle                = {Proceedings of the ACM/IFIP/USENIX 2003 International Conference on Middleware},
+  Year                     = {2003},
+  Organization             = {Springer-Verlag New York, Inc.},
+  Pages                    = {21--40}
+}
+
+@InProceedings{sourceroutingBF,
+  Title                    = {Self-routing denial-of-service resistant capabilities using in-packet Bloom filters},
+  Author                   = {Rothenberg, Christian Esteve and Jokela, Petri and Nikander, Pekka and Sarela, Mikko and Ylitalo, Jukka},
+  Booktitle                = {\Proc EC2ND},
+  Year                     = {2009},
+  Organization             = {IEEE},
+  Pages                    = {46--51}
+}
+
+@InCollection{Cloudcomputingplatform,
+  Title                    = {A cloud computing platform for large-scale forensic computing},
+  Author                   = {Roussev, Vassil and Wang, Liqiang and Richard, Golden and Marziale, Lodovico},
+  Booktitle                = {Advances in Digital Forensics V},
+  Publisher                = {Springer},
+  Year                     = {2009},
+  Pages                    = {201--214}
+}
+
+@InProceedings{PerCom05MANET,
+  Title                    = {Scalable service discovery for MANET},
+  Author                   = {Sailhan, Francoise and Issarny, Valerie},
+  Booktitle                = {\Proc IEEE PerCom},
+  Year                     = {2005},
+  Organization             = {IEEE},
+  Pages                    = {235--244}
+}
+
+@InProceedings{BloomCast,
+  Title                    = {Forwarding anomalies in Bloom filter-based multicast},
+  Author                   = {Sarela, M and Rothenberg, Christian Esteve and Aura, Tuomas and Zahemszky, Andr{\'a}s and Nikander, Pekka and Ott, J{\"o}rg},
+  Booktitle                = {\Proc IEEE  INFOCOM},
+  Year                     = {2011},
+  Organization             = {IEEE},
+  Pages                    = {2399--2407}
+}
+
+@Article{shannon,
+  Title                    = {Bell System Technical Journal},
+  Author                   = {Shannon, Claude E.},
+  Journal                  = {A Mathematical Theory of Communication},
+  Year                     = {1948},
+  Number                   = {3},
+  Pages                    = {379 -- 423},
+  Volume                   = {27}
+}
+
+@InProceedings{Sig01IPTrace,
+  Title                    = {Hash-based IP traceback},
+  Author                   = {Snoeren, Alex C and Partridge, Craig and Sanchez, Luis A and Jones, Christine E and Tchakountio, Fabrice and Kent, Stephen T and Strayer, W Timothy},
+  Booktitle                = {ACM SIGCOMM Computer Communication Review},
+  Year                     = {2001},
+  Number                   = {4},
+  Organization             = {ACM},
+  Pages                    = {3--14},
+  Volume                   = {31}
+}
+
+@Article{songsig05,
+  Title                    = {Fast hash table lookup using extended bloom filter: an aid to network processing},
+  Author                   = {Song, Haoyu and Dharmapurikar, Sarang and Turner, Jonathan and Lockwood, John},
+  Journal                  = {ACM SIGCOMM Computer Communication Review},
+  Year                     = {2005},
+  Number                   = {4},
+  Pages                    = {181--192},
+  Volume                   = {35},
+
+  Publisher                = {ACM}
+}
+
+@InProceedings{songV6,
+  Title                    = {Ipv6 lookups using distributed and load balanced bloom filters for 100gbps core router line cards},
+  Author                   = {Song, Haoyu and Hao, Fang and Kodialam, Murali and Lakshman, TV},
+  Booktitle                = {\Proc IEEE INFOCOM},
+  Year                     = {2009},
+  Organization             = {IEEE},
+  Pages                    = {2518--2526}
+}
+
+@InProceedings{BFWY,
+  Title                    = {NameFilter: Achieving fast name lookup with low memory cost via applying two-stage bloom filters},
+  Author                   = {Wang, Yi and Pan, Tian and Mi, Zhian and Dai, Huichen and Guo, Xiaoyu and Zhang, Ting and Liu, Bin and Dong, Qunfeng},
+  Booktitle                = {\Proc IEEE INFOCOM},
+  Year                     = {2013},
+  Organization             = {IEEE},
+  Pages                    = {95--99}
+}
+
+@InProceedings{wolfBF,
+  Title                    = {A credential-based data path architecture for assurable global networking},
+  Author                   = {Wolf, Tilman},
+  Booktitle                = {\Proc IEEE MILCOM 2007.},
+  Year                     = {2007},
+  Organization             = {IEEE},
+  Pages                    = {1--7}
+}
+
+@Article{JSAC05SN,
+  Title                    = {Statistical en-route filtering of injected false data in sensor networks},
+  Author                   = {Ye, Fan and Luo, Haiyun and Lu, Songwu and Zhang, Lixia},
+  Journal                  = {Selected Areas in Communications, IEEE Journal on},
+  Year                     = {2005},
+  Number                   = {4},
+  Pages                    = {839--850},
+  Volume                   = {23},
+
+  Publisher                = {IEEE}
+}
+
+@InProceedings{Info08memoryPC,
+  Title                    = {A memory-efficient hashing by multi-predicate Bloom filters for packet classification},
+  Author                   = {Yu, Heeyeol and Mahapatra, Rabi},
+  Booktitle                = {\Proc IEEE INFOCOM},
+  Year                     = {2008}
+}
+
+@InProceedings{yuConext09,
+  Title                    = {BUFFALO: bloom filter forwarding architecture for large organizations},
+  Author                   = {Yu, Minlan and Fabrikant, Alex and Rexford, Jennifer},
+  Booktitle                = {\Proc ACM CoNext},
+  Year                     = {2009},
+  Organization             = {ACM},
+  Pages                    = {313--324}
+}
+
+@Article{WE07securehoc,
+  Title                    = {A secure incentive protocol for mobile ad hoc networks},
+  Author                   = {Zhang, Yanchao and Lou, Wenjing and Liu, Wei and Fang, Yuguang},
+  Journal                  = {Wireless Networks},
+  Year                     = {2007},
+  Number                   = {5},
+  Pages                    = {569--582},
+  Volume                   = {13},
+
+  Publisher                = {Springer-Verlag New York, Inc.}
+}
+
+@Article{JSAC04Overlay,
+  Title                    = {Tapestry: A resilient global-scale overlay for service deployment},
+  Author                   = {Zhao, Ben Y and Huang, Ling and Stribling, Jeremy and Rhea, Sean C and Joseph, Anthony D and Kubiatowicz, John D},
+  Journal                  = {Selected Areas in Communications, IEEE Journal on},
+  Year                     = {2004},
+  Number                   = {1},
+  Pages                    = {41--53},
+  Volume                   = {22},
+
+  Publisher                = {IEEE}
+}
+
+@Misc{opensource,
+  Title                    = {Open Souce Website [On line]},
+  HowPublished             = {Available: https://github.com/bfcode/BFcode},
+
+  Bdsk-url-1               = {https://github.com/bfcode/BFcode}
+}
+

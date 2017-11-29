@@ -1,0 +1,166 @@
+/*
+ * Copyright (C) 2011-2016 Intel Corporation. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in
+ *     the documentation and/or other materials provided with the
+ *     distribution.
+ *   * Neither the name of Intel Corporation nor the names of its
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+
+/* Enclave.edl - Top EDL file. */
+
+enclave {
+    
+    include "user_types.h" /* buffer_t */
+    //include <stdarg.h>
+    /* Import ECALL/OCALL from sub-directory EDLs.
+     *  [from]: specifies the location of EDL file. 
+     *  [import]: specifies the functions to import, 
+     *  [*]: implies to import all functions.
+     */
+    from "vfslib/stdio.edl" import *;
+    from "vfslib/fcntl.edl" import *;
+    from "vfslib/stat.edl" import *;
+    from "vfslib/unistd.edl" import *;
+    //from "vfslib/mman.edl" import *;
+    from "vfslib/time.edl" import *;
+    from "vfslib/stdlib.edl" import *;
+    untrusted{
+        void ocall_malloc([in,out,size = 20]OMem* mem);
+        int ocall_reslutcp([in,out,size = 20]OMem* mem,[in,size=count]unsigned char* str,int count, [in,size=16]uint8_t* ecount);
+    };
+
+    trusted {
+        public int ecall_sqlite3_exec_once(
+            [in, string]const char *dbname, 
+            [in, string]const char *sql);
+
+        public int ecall_sqlite3_open(
+            [in, string]const char *filename, 
+            [out]struct tDB *pdb);
+
+        public int ecall_sqlite3_open_enc(
+            [in, string]const unsigned char *filenameEn,
+            int len, 
+            [in, string]unsigned char *ivec, 
+            [out]struct tDB *pdb);
+
+        public int ecall_sqlite3_prepare(
+            [in]struct tDB *pdb,              
+            [in, string]const char *zSql,
+            int nBytes);
+
+        public int ecall_sqlite3_prepare_v2(
+            [in]struct tDB *pdb,              
+            [in, string]const char *zSql,
+            int nBytes);
+
+        public int ecall_sqlite3_step();
+
+        public int ecall_sqlite3_finalize();
+
+        // public int ecall_sqlite3_get_table(
+        //     [in]struct tDB *pdb,            /* The database on which the SQL executes */
+        //     [in, string]const char *zSql,           /* The SQL to be executed */
+        //     [out, size = count_2]char **Result,          /* Write the result table here */
+        //     size_t Result_len,
+        //     size_t nRow,                  //Write the number of rows in the result here 
+        //     size_t nColumn,              /* Write the number of columns of result here */
+        //     [out, count=count_1]char *errmsg,               /* Write error messages here */
+        //     size_t count_1,
+        //     size_t count_2
+        //     );
+
+        // public void ecall_sqlite3_free_table(
+        //     [in, string]char **azResult            /* Result returned from from sqlite3_get_table() */
+        // );
+
+        public int ecall_sqlite3_exec(
+            [in]struct tDB *pdb,
+            [in, string]const char *sql,
+            [out, count=count]char *errmsg,
+            size_t count);
+
+        public int ecall_sqlite3_exec_enc(
+            [in]struct tDB *pdb,
+            [in, string]const unsigned char *cipher,
+            int len,
+            [in, string]unsigned char *ivec, 
+            [out, count=count]char *errmsg,
+            size_t count,
+            [in,out,count=8]unsigned char *pm,
+            int m_len
+            // [in,out,size=count2]char* strout,
+            // size_t count2
+            );
+
+        public int ecall_sqlite3_close([in]struct tDB *pdb);
+
+        public void ecall_sqlite3_errmsg(
+            [in]struct tDB *pdb,
+            [out, count=count]char *errmsg,
+            size_t count);
+
+        public int ecall_sqlite3_ctr_encrypt(
+            [in, string]const char *sql, 
+            [in, string]const char *sgx_ctr_key, 
+            [out, size = count]uint8_t *p_dst,
+            size_t count);
+
+        public int ecall_sqlite3_ctr_decrypt(
+            [in, string]unsigned char *cipher, 
+            [in, string]const char *sgx_ctr_key, 
+            [in, out, size = count]uint8_t *p_dst,
+            size_t count);
+
+        public int ecall_sqlite3_ctr_decrypt_2(
+            [in, string]unsigned char *ecount,
+            [in, string]unsigned char *cipher, 
+            [in, string]const unsigned char *sgx_ctr_key, 
+            [in, out, size = count]uint8_t *p_dst,
+            size_t count);
+
+        public void ecall_transfer_cipher(
+            [in, count=length]const unsigned char *key, 
+            [in, count=length]const unsigned char *cipher, 
+            [in, out, count=length]unsigned char *ecount,
+            size_t length);
+
+        public int ecall_vfs_sgx_test();
+
+       /* public void ecall_inter_sqlite3_mprintf(
+            [in,string]const char *zFormat, 
+            [in,string]unsigned char* zbuf,
+            [in, out,count = count]char *zsql, 
+            size_t count
+            );
+
+        public void ecall_sqlite3_free (
+            [in, out, size = count]void* p,
+            size_t count
+            );*/
+    };
+
+};

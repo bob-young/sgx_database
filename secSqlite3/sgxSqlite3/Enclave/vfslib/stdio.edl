@@ -1,0 +1,7 @@
+enclave {
+
+	untrusted {
+		//int ocall_remove([in, string]const char *pathname, [out]int *perrno);
+    };
+
+};

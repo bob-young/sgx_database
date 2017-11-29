@@ -1,0 +1,9 @@
+data()
+strftime('%Y',l_shipdate)
+substring----substr
+
+
+运行时间过长 17 20 22
+
+不可运行 7 9 19
+common 可以sgx不可以 9 19
