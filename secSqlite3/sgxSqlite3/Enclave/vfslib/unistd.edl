@@ -1,0 +1,28 @@
+enclave {
+	//include "../Enclave/vfslib/types.h"
+	untrusted {
+        ssize_t ocall_read(int file, [out, size=count] void *buf, size_t count, [out]int *perrno);
+        ssize_t ocall_write(int file, [in, size=count] const void *buf, size_t count, [out]int *perrno);
+        int ocall_close(int fd, [out]int *perrno);
+
+        int ocall_fchown(int fd, uid_t owner, gid_t group, [out]int *perrno);
+        char *ocall_getcwd([in,out, count = size]char *buf, size_t size, [out]int *perrno);
+        int ocall_truncate([in, string]const char *path, off_t length, [out]int *perrno);
+        int ocall_ftruncate(int fd, off_t length, [out]int *perrno);
+        ssize_t ocall_pread(int fd, [out,size=count]void *buf, size_t count, off_t offset, [out]int *perrno);
+        ssize_t ocall_pwrite(int fd, [in, size=count]const void *buf, size_t count, off_t offset, [out]int *perrno);
+        int ocall_access([in,string]const char* pathname, int mode, [out]int *perrno);
+        int ocall_unlink([in, string]const char *pathname, [out]int *perrno);
+        int ocall_rmdir([in, string]const char *pathname, [out]int *perrno);
+        uid_t ocall_geteuid(void);
+        //uid_t ocall_getuid(void);
+        off_t ocall_lseek(int fd, off_t offset, int whence, [out]int *perrno);
+        int ocall_fsync(int fd, [out]int *perrno);
+        pid_t ocall_getpid(void);
+        unsigned int ocall_sleep(unsigned int seconds);
+        int ocall_rtreslut([out,size=count]char *title,size_t count,[out,size = size]char *r, size_t size);
+        char *ocall_strcat([in,out,size =count]char *dest, size_t count, [in,string]const char *src);
+
+
+    };
+};

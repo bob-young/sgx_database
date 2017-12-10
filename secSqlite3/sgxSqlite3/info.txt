@@ -1,0 +1,644 @@
+/*##################Before Coding... (VERY IMPORTANT)###################*/
+//-----In file /opt/intel/sgxsdk/include/tlibc/sys/types.h 
+//-----after
+#ifndef _SYS_TYPES_H_
+#define _SYS_TYPES_H_
+//-----add a newline
+#define __VIVI_SGX_IN_ENCLAVE__
+
+
+
+ 
+/*################for gdb
+
+gcc -O0 -g open_exit.c -o test
+
+gdb
+  ptype uid_t
+  
+*/
+
+
+/*################# sys functions and macs called through the sqlite3.c ####################*/
+//functions
+geteuid unistd.h
+utimes  utime.h
+lseek   unistd.h
+fsync   unistd.h
+getenv  man 3 getenv stdlib.h
+getpid  unistd.h
+time    time.h
+sleep   man 3 sleep unistd.h
+gettimeofday  sys/time.h
+
+
+//macs
+S_ISDIR
+
+
+
+//stdio.h change
+open  fcntl.h
+read  unistd.h
+write unistd.h
+close unistd.h
+
+/*##################################24060####################################*/
+//24060:
+//NEED AN RELEVANT OCALL !
+static struct unix_syscall {
+  const char *zName;            /* Name of the system call */
+  sqlite3_syscall_ptr pCurrent; /* Current value of the system call */
+  sqlite3_syscall_ptr pDefault; /* Default value */
+} aSyscall[] = {
+
+//NEED AN RELEVANT OCALL !  fcntl.cpp
+  { "open",         (sqlite3_syscall_ptr)posixOpen,  0  },
+#define osOpen      ((int(*)(const char*,int,int))aSyscall[0].pCurrent)
+
+  
+//NEED AN RELEVANT OCALL !  unistd.cpp
+  { "close",        (sqlite3_syscall_ptr)close,      0  },
+#define osClose     ((int(*)(int))aSyscall[1].pCurrent)
+
+  
+//NEED AN RELEVANT OCALL !  unistd.cpp
+  { "access",       (sqlite3_syscall_ptr)access,     0  },
+#define osAccess    ((int(*)(const char*,int))aSyscall[2].pCurrent)
+
+  
+//NEED AN RELEVANT OCALL !  unistd.cpp
+  { "getcwd",       (sqlite3_syscall_ptr)getcwd,     0  },
+#define osGetcwd    ((char*(*)(char*,size_t))aSyscall[3].pCurrent)
+
+  
+//NEED AN RELEVANT OCALL !  stat.cpp
+  { "stat",         (sqlite3_syscall_ptr)stat,       0  },
+#define osStat      ((int(*)(const char*,struct stat*))aSyscall[4].pCurrent)
+
+/*
+** The DJGPP compiler environment looks mostly like Unix, but it
+** lacks the fcntl() system call.  So redefine fcntl() to be something
+** that always succeeds.  This means that locking does not occur under
+** DJGPP.  But it is DOS - what did you expect?
+*/
+#ifdef __DJGPP__
+  { "fstat",        0,                 0  },
+#define osFstat(a,b,c)    0
+#else     
+  
+//NEED AN RELEVANT OCALL !  stat.cpp
+  { "fstat",        (sqlite3_syscall_ptr)fstat,      0  },
+#define osFstat     ((int(*)(int,struct stat*))aSyscall[5].pCurrent)
+#endif
+
+  
+//NEED AN RELEVANT OCALL !  unistd.cpp
+  { "ftruncate",    (sqlite3_syscall_ptr)ftruncate,  0  },
+#define osFtruncate ((int(*)(int,off_t))aSyscall[6].pCurrent)
+
+  
+//NEED AN RELEVANT OCALL !  fcntl.cpp
+  { "fcntl",        (sqlite3_syscall_ptr)fcntl,      0  },
+#define osFcntl     ((int(*)(int,int,...))aSyscall[7].pCurrent)
+
+
+//NEED AN RELEVANT OCALL !  unistd.cpp
+  { "read",         (sqlite3_syscall_ptr)read,       0  },
+#define osRead      ((ssize_t(*)(int,void*,size_t))aSyscall[8].pCurrent)
+
+#if defined(USE_PREAD) || SQLITE_ENABLE_LOCKING_STYLE
+
+//NEED AN RELEVANT OCALL !  unistd.cpp
+  { "pread",        (sqlite3_syscall_ptr)pread,      0  },
+#else
+  { "pread",        (sqlite3_syscall_ptr)0,          0  },
+#endif
+#define osPread     ((ssize_t(*)(int,void*,size_t,off_t))aSyscall[9].pCurrent)
+
+#if defined(USE_PREAD64)
+
+//NEED AN RELEVANT OCALL !  unistd.cpp
+  { "pread64",      (sqlite3_syscall_ptr)pread64,    0  },
+#else
+  { "pread64",      (sqlite3_syscall_ptr)0,          0  },
+#endif
+#define osPread64   ((ssize_t(*)(int,void*,size_t,off_t))aSyscall[10].pCurrent)
+
+
+//NEED AN RELEVANT OCALL !  unistd.cpp
+  { "write",        (sqlite3_syscall_ptr)write,      0  },
+#define osWrite     ((ssize_t(*)(int,const void*,size_t))aSyscall[11].pCurrent)
+
+#if defined(USE_PREAD) || SQLITE_ENABLE_LOCKING_STYLE
+
+//NEED AN RELEVANT OCALL !  unistd.cpp
+  { "pwrite",       (sqlite3_syscall_ptr)pwrite,     0  },
+#else
+  { "pwrite",       (sqlite3_syscall_ptr)0,          0  },
+#endif
+#define osPwrite    ((ssize_t(*)(int,const void*,size_t,off_t))\
+                    aSyscall[12].pCurrent)
+
+
+//NEED AN RELEVANT OCALL !  unistd.cpp
+#if defined(USE_PREAD64)
+  { "pwrite64",     (sqlite3_syscall_ptr)pwrite64,   0  },
+#else
+  { "pwrite64",     (sqlite3_syscall_ptr)0,          0  },
+#endif
+#define osPwrite64  ((ssize_t(*)(int,const void*,size_t,off_t))\
+                    aSyscall[13].pCurrent)
+
+
+//NEED AN RELEVANT OCALL !  stat.cpp
+  { "fchmod",       (sqlite3_syscall_ptr)fchmod,     0  },
+#define osFchmod    ((int(*)(int,mode_t))aSyscall[14].pCurrent)
+
+#if defined(HAVE_POSIX_FALLOCATE) && HAVE_POSIX_FALLOCATE
+
+//NEED AN RELEVANT OCALL !  fcntl.cpp
+  { "fallocate",    (sqlite3_syscall_ptr)posix_fallocate,  0 },
+#else
+  { "fallocate",    (sqlite3_syscall_ptr)0,                0 },
+#endif
+#define osFallocate ((int(*)(int,off_t,off_t))aSyscall[15].pCurrent)
+
+
+//NEED AN RELEVANT OCALL !  unistd.cpp
+  { "unlink",       (sqlite3_syscall_ptr)unlink,           0 },
+#define osUnlink    ((int(*)(const char*))aSyscall[16].pCurrent)
+
+  { "openDirectory",    (sqlite3_syscall_ptr)openDirectory,      0 },
+#define osOpenDirectory ((int(*)(const char*,int*))aSyscall[17].pCurrent)
+
+
+//NEED AN RELEVANT OCALL !  stat.cpp
+  { "mkdir",        (sqlite3_syscall_ptr)mkdir,           0 },
+#define osMkdir     ((int(*)(const char*,mode_t))aSyscall[18].pCurrent)
+
+
+//NEED AN RELEVANT OCALL !  unistd.cpp
+  { "rmdir",        (sqlite3_syscall_ptr)rmdir,           0 },
+#define osRmdir     ((int(*)(const char*))aSyscall[19].pCurrent)
+
+
+//NEED AN RELEVANT OCALL !  unistd.cpp
+  { "fchown",       (sqlite3_syscall_ptr)posixFchown,     0 },
+#define osFchown    ((int(*)(int,uid_t,gid_t))aSyscall[20].pCurrent)
+
+#if !defined(SQLITE_OMIT_WAL) || SQLITE_MAX_MMAP_SIZE>0
+
+//NEED AN RELEVANT OCALL !  ?????? mman.cpp ??????
+  { "mmap",       (sqlite3_syscall_ptr)mmap,     0 },
+#define osMmap ((void*(*)(void*,size_t,int,int,int,off_t))aSyscall[21].pCurrent)
+
+//NEED AN RELEVANT OCALL !  ?????? mman.cpp ??????
+  { "munmap",       (sqlite3_syscall_ptr)munmap,          0 },
+#define osMunmap ((void*(*)(void*,size_t))aSyscall[22].pCurrent)
+
+#if HAVE_MREMAP
+
+//NEED AN RELEVANT OCALL !  ?????? mman.cpp ??????
+  { "mremap",       (sqlite3_syscall_ptr)mremap,          0 },
+#else
+  { "mremap",       (sqlite3_syscall_ptr)0,               0 },
+#endif
+#define osMremap ((void*(*)(void*,size_t,size_t,int,...))aSyscall[23].pCurrent)
+#endif
+
+}; /* End of the overrideable system calls */
+
+
+
+
+
+
+
+
+
+/*##################################23600####################################*/
+//23600:
+#ifndef SQLITE_OS_VVOS
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+/* #include <time.h> */
+#include <sys/time.h>
+#include <errno.h>
+#if !defined(SQLITE_OMIT_WAL) || SQLITE_MAX_MMAP_SIZE>0
+#include <sys/mman.h>
+#endif
+
+#else
+
+
+
+#endif /* SQLITE_OS_VVOS */
+
+
+#if SQLITE_ENABLE_LOCKING_STYLE
+# include <sys/ioctl.h>
+# if OS_VXWORKS
+#  include <semaphore.h>
+#  include <limits.h>
+# else
+#  include <sys/file.h>
+#  include <sys/param.h>
+# endif
+#endif /* SQLITE_ENABLE_LOCKING_STYLE */
+
+#if defined(__APPLE__) || (SQLITE_ENABLE_LOCKING_STYLE && !OS_VXWORKS)
+# include <sys/mount.h>
+#endif
+
+#ifdef HAVE_UTIME
+# include <utime.h>
+#endif
+
+
+
+
+
+
+
+
+
+/*##################################8278####################################*/
+//8278:
+#ifndef SQLITE_SGX_SUPPORT
+#include <stdio.h>
+#else
+#include "vfslib/stdio.h"
+#endif
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+#include <stddef.h>
+
+
+
+
+
+
+
+/*##################################24060####################################*/
+//24060:
+static struct unix_syscall {
+  const char *zName;            /* Name of the system call */
+  sqlite3_syscall_ptr pCurrent; /* Current value of the system call */
+  sqlite3_syscall_ptr pDefault; /* Default value */
+} aSyscall[] = {
+  { "open",         (sqlite3_syscall_ptr)posixOpen,  0  },
+#define osOpen      ((int(*)(const char*,int,int))aSyscall[0].pCurrent)
+
+  { "close",        (sqlite3_syscall_ptr)close,      0  },
+#define osClose     ((int(*)(int))aSyscall[1].pCurrent)
+
+  { "access",       (sqlite3_syscall_ptr)access,     0  },
+#define osAccess    ((int(*)(const char*,int))aSyscall[2].pCurrent)
+
+  { "getcwd",       (sqlite3_syscall_ptr)getcwd,     0  },
+#define osGetcwd    ((char*(*)(char*,size_t))aSyscall[3].pCurrent)
+
+  { "stat",         (sqlite3_syscall_ptr)stat,       0  },
+#define osStat      ((int(*)(const char*,struct stat*))aSyscall[4].pCurrent)
+
+/*
+** The DJGPP compiler environment looks mostly like Unix, but it
+** lacks the fcntl() system call.  So redefine fcntl() to be something
+** that always succeeds.  This means that locking does not occur under
+** DJGPP.  But it is DOS - what did you expect?
+*/
+#ifdef __DJGPP__
+  { "fstat",        0,                 0  },
+#define osFstat(a,b,c)    0
+#else     
+  { "fstat",        (sqlite3_syscall_ptr)fstat,      0  },
+#define osFstat     ((int(*)(int,struct stat*))aSyscall[5].pCurrent)
+#endif
+
+  { "ftruncate",    (sqlite3_syscall_ptr)ftruncate,  0  },
+#define osFtruncate ((int(*)(int,off_t))aSyscall[6].pCurrent)
+
+  { "fcntl",        (sqlite3_syscall_ptr)fcntl,      0  },
+#define osFcntl     ((int(*)(int,int,...))aSyscall[7].pCurrent)
+
+  { "read",         (sqlite3_syscall_ptr)read,       0  },
+#define osRead      ((ssize_t(*)(int,void*,size_t))aSyscall[8].pCurrent)
+
+#if defined(USE_PREAD) || SQLITE_ENABLE_LOCKING_STYLE
+  { "pread",        (sqlite3_syscall_ptr)pread,      0  },
+#else
+  { "pread",        (sqlite3_syscall_ptr)0,          0  },
+#endif
+#define osPread     ((ssize_t(*)(int,void*,size_t,off_t))aSyscall[9].pCurrent)
+
+#if defined(USE_PREAD64)
+  { "pread64",      (sqlite3_syscall_ptr)pread64,    0  },
+#else
+  { "pread64",      (sqlite3_syscall_ptr)0,          0  },
+#endif
+#define osPread64   ((ssize_t(*)(int,void*,size_t,off_t))aSyscall[10].pCurrent)
+
+  { "write",        (sqlite3_syscall_ptr)write,      0  },
+#define osWrite     ((ssize_t(*)(int,const void*,size_t))aSyscall[11].pCurrent)
+
+#if defined(USE_PREAD) || SQLITE_ENABLE_LOCKING_STYLE
+  { "pwrite",       (sqlite3_syscall_ptr)pwrite,     0  },
+#else
+  { "pwrite",       (sqlite3_syscall_ptr)0,          0  },
+#endif
+#define osPwrite    ((ssize_t(*)(int,const void*,size_t,off_t))\
+                    aSyscall[12].pCurrent)
+
+#if defined(USE_PREAD64)
+  { "pwrite64",     (sqlite3_syscall_ptr)pwrite64,   0  },
+#else
+  { "pwrite64",     (sqlite3_syscall_ptr)0,          0  },
+#endif
+#define osPwrite64  ((ssize_t(*)(int,const void*,size_t,off_t))\
+                    aSyscall[13].pCurrent)
+
+  { "fchmod",       (sqlite3_syscall_ptr)fchmod,     0  },
+#define osFchmod    ((int(*)(int,mode_t))aSyscall[14].pCurrent)
+
+#if defined(HAVE_POSIX_FALLOCATE) && HAVE_POSIX_FALLOCATE
+  { "fallocate",    (sqlite3_syscall_ptr)posix_fallocate,  0 },
+#else
+  { "fallocate",    (sqlite3_syscall_ptr)0,                0 },
+#endif
+#define osFallocate ((int(*)(int,off_t,off_t))aSyscall[15].pCurrent)
+
+  { "unlink",       (sqlite3_syscall_ptr)unlink,           0 },
+#define osUnlink    ((int(*)(const char*))aSyscall[16].pCurrent)
+
+  { "openDirectory",    (sqlite3_syscall_ptr)openDirectory,      0 },
+#define osOpenDirectory ((int(*)(const char*,int*))aSyscall[17].pCurrent)
+
+  { "mkdir",        (sqlite3_syscall_ptr)mkdir,           0 },
+#define osMkdir     ((int(*)(const char*,mode_t))aSyscall[18].pCurrent)
+
+  { "rmdir",        (sqlite3_syscall_ptr)rmdir,           0 },
+#define osRmdir     ((int(*)(const char*))aSyscall[19].pCurrent)
+
+  { "fchown",       (sqlite3_syscall_ptr)posixFchown,     0 },
+#define osFchown    ((int(*)(int,uid_t,gid_t))aSyscall[20].pCurrent)
+
+#if !defined(SQLITE_OMIT_WAL) || SQLITE_MAX_MMAP_SIZE>0
+  { "mmap",       (sqlite3_syscall_ptr)mmap,     0 },
+#define osMmap ((void*(*)(void*,size_t,int,int,int,off_t))aSyscall[21].pCurrent)
+
+  { "munmap",       (sqlite3_syscall_ptr)munmap,          0 },
+#define osMunmap ((void*(*)(void*,size_t))aSyscall[22].pCurrent)
+
+#if HAVE_MREMAP
+  { "mremap",       (sqlite3_syscall_ptr)mremap,          0 },
+#else
+  { "mremap",       (sqlite3_syscall_ptr)0,               0 },
+#endif
+#define osMremap ((void*(*)(void*,size_t,size_t,int,...))aSyscall[23].pCurrent)
+#endif
+
+}; /* End of the overrideable system calls */
+
+
+
+
+
+
+
+/*##################################28619####################################*/
+//28619:
+#define IOMETHODS(FINDER, METHOD, VERSION, CLOSE, LOCK, UNLOCK, CKLOCK)      \
+static const sqlite3_io_methods METHOD = {                                   \
+   VERSION,                    /* iVersion */                                \
+   CLOSE,                      /* xClose */                                  \
+   unixRead,                   /* xRead */                                   \
+   unixWrite,                  /* xWrite */                                  \
+   unixTruncate,               /* xTruncate */                               \
+   unixSync,                   /* xSync */                                   \
+   unixFileSize,               /* xFileSize */                               \
+   LOCK,                       /* xLock */                                   \
+   UNLOCK,                     /* xUnlock */                                 \
+   CKLOCK,                     /* xCheckReservedLock */                      \
+   unixFileControl,            /* xFileControl */                            \
+   unixSectorSize,             /* xSectorSize */                             \
+   unixDeviceCharacteristics,  /* xDeviceCapabilities */                     \
+   unixShmMap,                 /* xShmMap */                                 \
+   unixShmLock,                /* xShmLock */                                \
+   unixShmBarrier,             /* xShmBarrier */                             \
+   unixShmUnmap,               /* xShmUnmap */                               \
+   unixFetch,                  /* xFetch */                                  \
+   unixUnfetch,                /* xUnfetch */                                \
+};                                                                           \
+static const sqlite3_io_methods *FINDER##Impl(const char *z, unixFile *p){   \
+  UNUSED_PARAMETER(z); UNUSED_PARAMETER(p);                                  \
+  return &METHOD;                                                            \
+}                                                                            \
+static const sqlite3_io_methods *(*const FINDER)(const char*,unixFile *p)    \
+    = FINDER##Impl;
+
+/*
+** Here are all of the sqlite3_io_methods objects for each of the
+** locking strategies.  Functions that return pointers to these methods
+** are also created.
+*/
+IOMETHODS(
+  posixIoFinder,            /* Finder function name */
+  posixIoMethods,           /* sqlite3_io_methods object name */
+  3,                        /* shared memory and mmap are enabled */
+  unixClose,                /* xClose method */
+  unixLock,                 /* xLock method */
+  unixUnlock,               /* xUnlock method */
+  unixCheckReservedLock     /* xCheckReservedLock method */
+)
+IOMETHODS(
+  nolockIoFinder,           /* Finder function name */
+  nolockIoMethods,          /* sqlite3_io_methods object name */
+  1,                        /* shared memory is disabled */
+  nolockClose,              /* xClose method */
+  nolockLock,               /* xLock method */
+  nolockUnlock,             /* xUnlock method */
+  nolockCheckReservedLock   /* xCheckReservedLock method */
+)
+IOMETHODS(
+  dotlockIoFinder,          /* Finder function name */
+  dotlockIoMethods,         /* sqlite3_io_methods object name */
+  1,                        /* shared memory is disabled */
+  dotlockClose,             /* xClose method */
+  dotlockLock,              /* xLock method */
+  dotlockUnlock,            /* xUnlock method */
+  dotlockCheckReservedLock  /* xCheckReservedLock method */
+)
+
+#if SQLITE_ENABLE_LOCKING_STYLE && !OS_VXWORKS
+IOMETHODS(
+  flockIoFinder,            /* Finder function name */
+  flockIoMethods,           /* sqlite3_io_methods object name */
+  1,                        /* shared memory is disabled */
+  flockClose,               /* xClose method */
+  flockLock,                /* xLock method */
+  flockUnlock,              /* xUnlock method */
+  flockCheckReservedLock    /* xCheckReservedLock method */
+)
+#endif
+
+#if OS_VXWORKS
+IOMETHODS(
+  semIoFinder,              /* Finder function name */
+  semIoMethods,             /* sqlite3_io_methods object name */
+  1,                        /* shared memory is disabled */
+  semClose,                 /* xClose method */
+  semLock,                  /* xLock method */
+  semUnlock,                /* xUnlock method */
+  semCheckReservedLock      /* xCheckReservedLock method */
+)
+#endif
+
+#if defined(__APPLE__) && SQLITE_ENABLE_LOCKING_STYLE
+IOMETHODS(
+  afpIoFinder,              /* Finder function name */
+  afpIoMethods,             /* sqlite3_io_methods object name */
+  1,                        /* shared memory is disabled */
+  afpClose,                 /* xClose method */
+  afpLock,                  /* xLock method */
+  afpUnlock,                /* xUnlock method */
+  afpCheckReservedLock      /* xCheckReservedLock method */
+)
+#endif
+
+/*
+** The proxy locking method is a "super-method" in the sense that it
+** opens secondary file descriptors for the conch and lock files and
+** it uses proxy, dot-file, AFP, and flock() locking methods on those
+** secondary files.  For this reason, the division that implements
+** proxy locking is located much further down in the file.  But we need
+** to go ahead and define the sqlite3_io_methods and finder function
+** for proxy locking here.  So we forward declare the I/O methods.
+*/
+#if defined(__APPLE__) && SQLITE_ENABLE_LOCKING_STYLE
+static int proxyClose(sqlite3_file*);
+static int proxyLock(sqlite3_file*, int);
+static int proxyUnlock(sqlite3_file*, int);
+static int proxyCheckReservedLock(sqlite3_file*, int*);
+IOMETHODS(
+  proxyIoFinder,            /* Finder function name */
+  proxyIoMethods,           /* sqlite3_io_methods object name */
+  1,                        /* shared memory is disabled */
+  proxyClose,               /* xClose method */
+  proxyLock,                /* xLock method */
+  proxyUnlock,              /* xUnlock method */
+  proxyCheckReservedLock    /* xCheckReservedLock method */
+)
+#endif
+
+/* nfs lockd on OSX 10.3+ doesn't clear write locks when a read lock is set */
+#if defined(__APPLE__) && SQLITE_ENABLE_LOCKING_STYLE
+IOMETHODS(
+  nfsIoFinder,               /* Finder function name */
+  nfsIoMethods,              /* sqlite3_io_methods object name */
+  1,                         /* shared memory is disabled */
+  unixClose,                 /* xClose method */
+  unixLock,                  /* xLock method */
+  nfsUnlock,                 /* xUnlock method */
+  unixCheckReservedLock      /* xCheckReservedLock method */
+)
+#endif
+
+
+
+/*##################################31078####################################*/
+//31078:
+SQLITE_API int sqlite3_os_init(void){ 
+  /* 
+  ** The following macro defines an initializer for an sqlite3_vfs object.
+  ** The name of the VFS is NAME.  The pAppData is a pointer to a pointer
+  ** to the "finder" function.  (pAppData is a pointer to a pointer because
+  ** silly C90 rules prohibit a void* from being cast to a function pointer
+  ** and so we have to go through the intermediate pointer to avoid problems
+  ** when compiling with -pedantic-errors on GCC.)
+  **
+  ** The FINDER parameter to this macro is the name of the pointer to the
+  ** finder-function.  The finder-function returns a pointer to the
+  ** sqlite_io_methods object that implements the desired locking
+  ** behaviors.  See the division above that contains the IOMETHODS
+  ** macro for addition information on finder-functions.
+  **
+  ** Most finders simply return a pointer to a fixed sqlite3_io_methods
+  ** object.  But the "autolockIoFinder" available on MacOSX does a little
+  ** more than that; it looks at the filesystem type that hosts the 
+  ** database file and tries to choose an locking method appropriate for
+  ** that filesystem time.
+  */
+  #define UNIXVFS(VFSNAME, FINDER) {                        \
+    3,                    /* iVersion */                    \
+    sizeof(unixFile),     /* szOsFile */                    \
+    MAX_PATHNAME,         /* mxPathname */                  \
+    0,                    /* pNext */                       \
+    VFSNAME,              /* zName */                       \
+    (void*)&FINDER,       /* pAppData */                    \
+    unixOpen,             /* xOpen */                       \
+    unixDelete,           /* xDelete */                     \
+    unixAccess,           /* xAccess */                     \
+    unixFullPathname,     /* xFullPathname */               \
+    unixDlOpen,           /* xDlOpen */                     \
+    unixDlError,          /* xDlError */                    \
+    unixDlSym,            /* xDlSym */                      \
+    unixDlClose,          /* xDlClose */                    \
+    unixRandomness,       /* xRandomness */                 \
+    unixSleep,            /* xSleep */                      \
+    unixCurrentTime,      /* xCurrentTime */                \
+    unixGetLastError,     /* xGetLastError */               \
+    unixCurrentTimeInt64, /* xCurrentTimeInt64 */           \
+    unixSetSystemCall,    /* xSetSystemCall */              \
+    unixGetSystemCall,    /* xGetSystemCall */              \
+    unixNextSystemCall,   /* xNextSystemCall */             \
+  }
+
+  /*
+  ** All default VFSes for unix are contained in the following array.
+  **
+  ** Note that the sqlite3_vfs.pNext field of the VFS object is modified
+  ** by the SQLite core when the VFS is registered.  So the following
+  ** array cannot be const.
+  */
+  static sqlite3_vfs aVfs[] = {
+#if SQLITE_ENABLE_LOCKING_STYLE && (OS_VXWORKS || defined(__APPLE__))
+    UNIXVFS("unix",          autolockIoFinder ),
+#else
+    UNIXVFS("unix",          posixIoFinder ),
+#endif
+    UNIXVFS("unix-none",     nolockIoFinder ),
+    UNIXVFS("unix-dotfile",  dotlockIoFinder ),
+    UNIXVFS("unix-excl",     posixIoFinder ),
+#if OS_VXWORKS
+    UNIXVFS("unix-namedsem", semIoFinder ),
+#endif
+#if SQLITE_ENABLE_LOCKING_STYLE
+    UNIXVFS("unix-posix",    posixIoFinder ),
+#if !OS_VXWORKS
+    UNIXVFS("unix-flock",    flockIoFinder ),
+#endif
+#endif
+#if SQLITE_ENABLE_LOCKING_STYLE && defined(__APPLE__)
+    UNIXVFS("unix-afp",      afpIoFinder ),
+    UNIXVFS("unix-nfs",      nfsIoFinder ),
+    UNIXVFS("unix-proxy",    proxyIoFinder ),
+#endif
+  };
+  unsigned int i;          /* Loop counter */
+
+  /* Double-check that the aSyscall[] array has been constructed
+  ** correctly.  See ticket [bb3a86e890c8e96ab] */
+  assert( ArraySize(aSyscall)==24 );
+
+  /* Register all VFSes defined in the aVfs[] array */
+  for(i=0; i<(sizeof(aVfs)/sizeof(sqlite3_vfs)); i++){
+    sqlite3_vfs_register(&aVfs[i], i==0);
+  }
+  return SQLITE_OK; 
+
+
