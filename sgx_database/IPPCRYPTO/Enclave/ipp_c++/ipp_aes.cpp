@@ -6,16 +6,7 @@
 
 //ipp_aes::ipp_aes(){}
 
-int block_size=512;
-int AES_GCM_ContextSize=0;
-IppsAES_GCMState* gcm_context;
-unsigned char* t_pwd;
-int t_pwdlen;
-unsigned char* t_piv;
-int t_pivlen;
-int ipp_init;
-
-IppStatus init(unsigned char* pwd,int pwdlen,unsigned char* piv,int pivlen)
+IppStatus ipp_aes::init(unsigned char* pwd,int pwdlen,unsigned char* piv,int pivlen)
 {
 	IppStatus istate;
 	if(pwdlen!=16 && pwdlen!=24 && pwdlen!=32){
@@ -51,12 +42,12 @@ IppStatus init(unsigned char* pwd,int pwdlen,unsigned char* piv,int pivlen)
 	return istate;
 }
 
-IppStatus reset()
+IppStatus ipp_aes::reset()
 {
-	return init(t_pwd,t_pwdlen,t_piv,t_pivlen);
+	return ipp_aes::init(t_pwd,t_pwdlen,t_piv,t_pivlen);
 }
 
-IppStatus encrypt(unsigned char* src,unsigned char* dest,int length)
+IppStatus ipp_aes::encrypt(unsigned char* src,unsigned char* dest,int length)
 {
 	IppStatus istate;
 	for(int i=0;i<length;i=i+block_size){
@@ -76,7 +67,7 @@ IppStatus encrypt(unsigned char* src,unsigned char* dest,int length)
 	return istate;
 }
 
-IppStatus decrypt(unsigned char* src,unsigned char* dest,int length)
+IppStatus ipp_aes::decrypt(unsigned char* src,unsigned char* dest,int length)
 {
 	IppStatus istate;
 	for(int i=0;i<length;i=i+block_size){
