@@ -1,0 +1,6 @@
+break Enclave/sqlite3.c:95539
+break /home/llt-xd/svn/secSqlite3/sgxSqlite3/Enclave/sqlite3.c:100001
+break /home/llt-xd/svn/secSqlite3/sgxSqlite3/Enclave/sqlite3.c:99833
+break /home/llt-xd/svn/secSqlite3/sgxSqlite3/Enclave/sqlite3.c:99432
+break /home/llt-xd/svn/secSqlite3/sgxSqlite3/Enclave/sqlite3.c:53604
+break /home/llt-xd/svn/secSqlite3/sgxSqlite3/Enclave/sqlite3.c:44757

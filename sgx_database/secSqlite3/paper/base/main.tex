@@ -1,0 +1,116 @@
+\documentclass[conference]{IEEEtran}
+
+% % % % % % % % % % package starts...% % % % % % % % % % % % % % % % % % % % %
+	\usepackage{graphicx}
+	\usepackage{balance} % for  \balance command ON LAST PAGE  (only there!)
+	\usepackage{amssymb, amsmath}
+	\usepackage{multirow, rotating, wasysym, url}
+	\usepackage[tight]{subfigure}
+	%\usepackage[retainorgcmds]{InputFiles/IEEEtrantools}
+	\usepackage[ruled,linesnumbered,vlined]{algorithm2e}
+%	\usepackage[ruled,linesnumbered,vlined]{algorithm2e}
+%	\usepackage[ruled,linesnumbered,vlined,algo2e]{algorithm2e}
+%	\usepackage{algorithm}
+%	\usepackage{algorithmic}
+	\usepackage{hyperref} %reference hyper links.
+	\usepackage{color}
+%    \usepackage{natbib}
+\definecolor{greener}{RGB}{0,166,0}
+\definecolor{reder}{RGB}{255,0,0}
+\definecolor{bluer}{RGB}{0,0,255}
+
+    \usepackage[iso]{datetime}
+    
+% by vivi
+	\setlength{\textfloatsep}{8pt plus 1.0pt minus 2.0pt}
+	\setlength{\intextsep}{6pt plus 1.0pt minus 1.0pt}
+	\setlength{\columnsep}{0.2in}
+%	\usepackage[skip=2pt]{caption}  
+%	\setlength{\abovecaptionskip}{0cm}  
+% % % % % % % % % % package ends...% % % % % % % % % % % % % % % % % % % % % %
+
+\graphicspath{{./DrawingFigures/},{./EvaluateFigures/}}
+
+% % % % % % % % % % New command starts...% % % % % % % % % % % % % % % % % % %
+	\newcommand{\presec}{\vspace{-0.0in}}
+	\newcommand{\postsec}{\vspace{-0.0in}}
+	\newcommand{\presub}{\vspace{-0.0in}}
+	\newcommand{\postsub}{\vspace{-0.0in}}
+	\newcommand{\precaption}{\vspace{-0in}}
+	\newcommand{\postcaption}{\vspace{-0in}}
+	\newcommand{\preequation}{\vspace{-0.0in}}
+	\newcommand{\postequation}{\vspace{-0.0in}}
+	\newcommand{\prefig}{\vspace{-0in}}
+	\newcommand{\prefigcaption}{\vspace{-0in}}
+	\newcommand{\postfig}{\vspace{-0.0in}}
+	\newcommand{\subfigs}{\hspace{-0in}}
+	\newcommand{\subfigsvert}{\vspace{-0in}}
+	\newcommand{\pretheorem}{\vspace{-0.0in}}
+	\newcommand{\posttheorem}{\vspace{-0.0in}}
+		\input{InputFiles/new-commands}
+		\newcommand{\Proc}{Proc. }
+		\newcommand{\Conf}{Conf. }
+		\newcommand{\Inte}{Int. }
+		\newcommand{\Symp}{Symp. }
+	\newcommand{\tabincell}[2]{\begin{tabular}{@{}#1@{}}#2\end{tabular}}
+	
+	\newcommand{\figwidthdraw}{0.45\textwidth}
+	\newcommand{\figwidtheva}{0.31\textwidth}
+
+%    \renewcommand{\algorithmicrequire}{\textbf{Input:}}
+%    \renewcommand{\algorithmicensure}{\textbf{Output:}}
+% % % % % % % % % % New command ends...% % % % % % % % % % % % % % % % % % % %
+
+% % % % % % % % % % Backup starts... % % % % % % % % % % % % % % % % % % % % %
+	%\clubpenalty=10000
+	%\widowpenalty = 10000
+	%\usepackage{caption2} %fo setlength
+	%\setlength{\parskip}{0.1\baselineskip}
+	%\setlength{\abovecaptionskip}{-1pt}
+	
+	%\vfill\eject % force going to next page
+% % % % % % % % % % Backup ends... % % % % % % % % % % % % % % % % % % % % % %
+
+%%%%%%%%%%%%%%%%%%
+        \clubpenalty=10000
+        \widowpenalty = 10000
+%%%%%%%%%%%%%%%%%%
+
+\title{Secure Sqlites using SGX}
+
+%\author{\IEEEauthorblockN{Yongchao Dang$^1$, Yin Chen$^2$, Yulong Shen$^1$ and Xiaohong Jiang$^3$}
+%	\IEEEauthorblockA{ $^1$School of Computer Science and Technology, Xidian University, China \\
+%		$^2$Graduate School of Media and Governance, Keio Univerisity, Japan \\
+%		$^3$School of Systems Information Science, Future University Hakodate, Japan\\
+%		Email: dangyc305@163.com,  yin@ht.sfc.keio.ac.jp, ylshen@mail.xidian.edu.cn, jiang@fun.ac.jp}
+%}
+
+\author{\IEEEauthorblockN{Lingtong Liu\IEEEauthorrefmark{1}, Yulong Shen\IEEEauthorrefmark{1}, Yongzhi Wang\IEEEauthorrefmark{1}.}
+	\IEEEauthorblockA{\IEEEauthorrefmark{1} School of Computer Science and Technology, Xidian University, China\\
+	xviviliu@gmail.com, ylshen@mail.xidian.edu.cn, \textcolor{red}{yongzhiwang@gmail.com}}}
+
+
+%\author{
+%\IEEEauthorblockN{Lingtong Liu\IEEEauthorrefmark{1}, Yulong Shen\IEEEauthorrefmark{1}.}
+%\IEEEauthorblockA{\IEEEauthorrefmark{1} School of Computer Science and Technology, Xidian University, China}
+%}
+
+%\author{Paper for IEEE GlobeCom '16 \#1570264760, 7 pages (additional 1 page for 100 \$) with 10-point font}
+
+\begin{document}
+\maketitle
+\sloppy
+	\input{LiuLingtong/abstract}
+	\input{LiuLingtong/introduction}
+	\input{LiuLingtong/background}
+	\input{LiuLingtong/securitymodel}
+	\input{MaJiawen/systemdesign}
+	\input{SuCuicui/experiments}
+	\input{LiuLingtong/relatedwork}
+	\input{LiuLingtong/conclusion}
+	\balance
+	\bibliographystyle{IEEEtran}
+	\bibliography{InputFiles/reference}
+\end{document}
+
+

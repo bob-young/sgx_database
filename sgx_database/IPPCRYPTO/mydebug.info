@@ -1,0 +1,194 @@
+Debug Info:
+
+(gdb) n
+122637	  rc = sqlite3BtreeOpen(db->pVfs, zOpen, db, &db->aDb[0].pBt, 0,
+(gdb) 
+[Inferior 1 (process 27617) exited with code 01]
+
+
+
+Breakpoint 1, sqlite3BtreeBeginTrans (p=0x7fffee4475f8, wrflag=0)
+    at Enclave/sqlite3.c:53604
+53604	    while( pBt->pPage1==0 && SQLITE_OK==(rc = lockBtree(pBt)) );
+(gdb) c
+Continuing.
+
+Breakpoint 2, sqlite3PagerSharedLock (pPager=0x7fffee447b18)
+    at Enclave/sqlite3.c:44567
+44567	  int rc = SQLITE_OK;                /* Return code */
+(gdb) n
+44577	  if( NEVER(MEMDB && pPager->errCode) ){ return pPager->errCode; }
+(gdb) 
+44579	  if( !pagerUseWal(pPager) && pPager->eState==PAGER_OPEN ){
+(gdb) 
+44580	    int bHotJournal = 1;          /* True if there exists a hot journal-file */
+(gdb) p pPager->eState 
+$1 = 0 '\000'                //Should be 1  --vivi
+(gdb) call pagerUseWal(pPager)
+$2 = 0
+(gdb) bt
+#0  sqlite3PagerSharedLock (pPager=0x7fffee447b18) at Enclave/sqlite3.c:44580
+#1  0x00007fffee186554 in lockBtree (pBt=0x7fffee447658)
+    at Enclave/sqlite3.c:53266
+#2  0x00007fffee186ce9 in sqlite3BtreeBeginTrans (p=0x7fffee4475f8, wrflag=0)
+    at Enclave/sqlite3.c:53604
+#3  0x00007fffee1cfbb3 in sqlite3InitOne (db=0x7fffee447018, iDb=0, 
+    pzErrMsg=0x7fffee457cc0) at Enclave/sqlite3.c:99432
+#4  0x00007fffee1d00a7 in sqlite3Init (db=0x7fffee447018, 
+    pzErrMsg=0x7fffee457cc0) at Enclave/sqlite3.c:99608
+#5  0x00007fffee1d01a2 in sqlite3ReadSchema (pParse=0x7fffee457cb8)
+    at Enclave/sqlite3.c:99645
+#6  0x00007fffee1b68e8 in sqlite3LocateTable (pParse=0x7fffee457cb8, isView=0, 
+    zName=0x7fffee457a20 "tbl1", zDbase=0x0) at Enclave/sqlite3.c:85143
+#7  0x00007fffee1b6a16 in sqlite3LocateTableItem (pParse=0x7fffee457cb8, 
+    isView=0, p=0x7fffee457aa8) at Enclave/sqlite3.c:85182
+#8  0x00007fffee1d83c4 in selectExpander (pWalker=0x7ffff40864c0, 
+    p=0x7fffee4579a0) at Enclave/sqlite3.c:104033
+#9  0x00007fffee1a7eac in sqlite3WalkSelect (pWalker=0x7ffff40864c0, 
+    p=0x7fffee4579a0) at Enclave/sqlite3.c:75676
+#10 0x00007fffee1d8e33 in sqlite3SelectExpand (pParse=0x7fffee457cb8, 
+    pSelect=0x7fffee4579a0) at Enclave/sqlite3.c:104276
+#11 0x00007fffee1d8fd9 in sqlite3SelectPrep (pParse=0x7fffee457cb8, 
+    p=0x7fffee4579a0, pOuterNC=0x0) at Enclave/sqlite3.c:104362
+---Type <return> to continue, or q <return> to quit---
+#12 0x00007fffee1d973d in sqlite3Select (pParse=0x7fffee457cb8, 
+    p=0x7fffee4579a0, pDest=0x7ffff40868c0) at Enclave/sqlite3.c:104592
+#13 0x00007fffee1ef8c3 in yy_reduce (yypParser=0x7fffee457f58, yyruleno=111)
+    at Enclave/sqlite3.c:117779
+#14 0x00007fffee1f2e4d in sqlite3Parser (yyp=0x7fffee457f58, yymajor=1, 
+    yyminor=..., pParse=0x7fffee457cb8) at Enclave/sqlite3.c:118817
+#15 0x00007fffee1f3bae in sqlite3RunParser (pParse=0x7fffee457cb8, 
+    zSql=0x7fffee227a59 "select * from tbl1;", pzErrMsg=0x7ffff4086a58)
+    at Enclave/sqlite3.c:119635
+#16 0x00007fffee1d05d6 in sqlite3Prepare (db=0x7fffee447018, 
+    zSql=0x7fffee227a59 "select * from tbl1;", nBytes=-1, saveSqlFlag=1, 
+    pReprepare=0x0, ppStmt=0x7ffff4086b98, pzTail=0x7ffff4086b90)
+    at Enclave/sqlite3.c:99833
+#17 0x00007fffee1d0908 in sqlite3LockAndPrepare (db=0x7fffee447018, 
+    zSql=0x7fffee227a59 "select * from tbl1;", nBytes=-1, saveSqlFlag=1, 
+    pOld=0x0, ppStmt=0x7ffff4086b98, pzTail=0x7ffff4086b90)
+    at Enclave/sqlite3.c:99925
+#18 0x00007fffee1d0aa3 in sqlite3_prepare_v2 (db=0x7fffee447018, 
+    zSql=0x7fffee227a59 "select * from tbl1;", nBytes=-1, 
+    ppStmt=0x7ffff4086b98, pzTail=0x7ffff4086b90) at Enclave/sqlite3.c:100001
+#19 0x00007fffee1ca525 in sqlite3_exec (db=0x7fffee447018, 
+    zSql=0x7fffee227a59 "select * from tbl1;", 
+    xCallback=0x7fffee1f98c2 <callback(void*, int, char**, char**)>, pArg=0x0, 
+---Type <return> to continue, or q <return> to quit---
+    pzErrMsg=0x7ffff4086be8) at Enclave/sqlite3.c:95555
+#20 0x00007fffee1f9a36 in ecall_sqlite3_exec () at Enclave/Enclave.cpp:423
+#21 0x00007fffee1648d3 in sgx_ecall_sqlite3_exec (pms=0x7fffffffdba0)
+    at Enclave/Enclave_t.c:215
+#22 0x00007fffee1fac49 in do_ecall ()
+#23 0x00007fffee1fa9b9 in enter_enclave ()
+#24 0x00007fffee1fc75a in enclave_entry ()
+#25 0x00007ffff7bc210c in __morestack () from /usr/lib/libsgx_urts_sim.so
+#26 0x00007ffff7bbfabf in do_ecall(int, void const*, void const*, CTrustThread*) () from /usr/lib/libsgx_urts_sim.so
+#27 0x00007ffff7bbb3a9 in CEnclave::ecall(int, void const*, void*) ()
+   from /usr/lib/libsgx_urts_sim.so
+#28 0x00007ffff7bbe565 in sgx_ecall () from /usr/lib/libsgx_urts_sim.so
+#29 0x0000000000401a6f in ecall_sqlite3_exec (eid=29665339113474, 
+    retval=0x7fffffffdbd8) at App/Enclave_u.c:474
+#30 0x0000000000401f77 in main (argc=1, argv=0x7fffffffdcc8)
+    at App/sqlite3Client.cpp:240
+
+
+
+
+
+//-----sqlite3 without SGX-----
+(gdb) bt
+#0  sqlite3PagerSharedLock (pPager=0x6c2ec8) at sqlite3.c:44712
+#1  0x000000000042b6cb in lockBtree (pBt=0x6c2e08) at sqlite3.c:53215
+#2  0x000000000042be69 in sqlite3BtreeBeginTrans (p=0x6c2da8, wrflag=0)
+    at sqlite3.c:53553
+#3  0x000000000047462a in sqlite3InitOne (db=0x6c2808, iDb=0, 
+    pzErrMsg=0x6d3180) at sqlite3.c:99381
+#4  0x0000000000474b14 in sqlite3Init (db=0x6c2808, pzErrMsg=0x6d3180)
+    at sqlite3.c:99557
+#5  0x0000000000474c0f in sqlite3ReadSchema (pParse=0x6d3178)
+    at sqlite3.c:99594
+#6  0x000000000045b6ba in sqlite3LocateTable (pParse=0x6d3178, isView=0, 
+    zName=0x6d2e68 "tbl1", zDbase=0x0) at sqlite3.c:85092
+#7  0x000000000045b7e0 in sqlite3LocateTableItem (pParse=0x6d3178, isView=0, 
+    p=0x6d2ef0) at sqlite3.c:85131
+#8  0x000000000047cd84 in selectExpander (pWalker=0x7fffffffbe20, p=0x6d2de8)
+    at sqlite3.c:103982
+#9  0x000000000044ce01 in sqlite3WalkSelect (pWalker=0x7fffffffbe20, 
+    p=0x6d2de8) at sqlite3.c:75625
+#10 0x000000000047d7d9 in sqlite3SelectExpand (pParse=0x6d3178, 
+    pSelect=0x6d2de8) at sqlite3.c:104225
+#11 0x000000000047d979 in sqlite3SelectPrep (pParse=0x6d3178, p=0x6d2de8, 
+    pOuterNC=0x0) at sqlite3.c:104311
+#12 0x000000000047e0d3 in sqlite3Select (pParse=0x6d3178, p=0x6d2de8, 
+---Type <return> to continue, or q <return> to quit---
+    pDest=0x7fffffffc220) at sqlite3.c:104541
+#13 0x00000000004940ca in yy_reduce (yypParser=0x6d3418, yyruleno=111)
+    at sqlite3.c:117728
+#14 0x0000000000497626 in sqlite3Parser (yyp=0x6d3418, yymajor=1, yyminor=..., 
+    pParse=0x6d3178) at sqlite3.c:118766
+#15 0x00000000004982f0 in sqlite3RunParser (pParse=0x6d3178, 
+    zSql=0x6c2780 "select * from tbl1;", pzErrMsg=0x7fffffffc3b8)
+    at sqlite3.c:119584
+#16 0x000000000047503c in sqlite3Prepare (db=0x6c2808, 
+    zSql=0x6c2780 "select * from tbl1;", nBytes=-1, saveSqlFlag=1, 
+    pReprepare=0x0, ppStmt=0x7fffffffc4e8, pzTail=0x7fffffffc4f0)
+    at sqlite3.c:99782
+#17 0x0000000000475361 in sqlite3LockAndPrepare (db=0x6c2808, 
+    zSql=0x6c2780 "select * from tbl1;", nBytes=-1, saveSqlFlag=1, pOld=0x0, 
+    ppStmt=0x7fffffffc4e8, pzTail=0x7fffffffc4f0) at sqlite3.c:99874
+#18 0x00000000004754fc in sqlite3_prepare_v2 (db=0x6c2808, 
+    zSql=0x6c2780 "select * from tbl1;", nBytes=-1, ppStmt=0x7fffffffc4e8, 
+    pzTail=0x7fffffffc4f0) at sqlite3.c:99950
+#19 0x0000000000404964 in shell_exec (db=0x6c2808, 
+    zSql=0x6c2780 "select * from tbl1;", xCallback=0x402770 <shell_callback>, 
+    pArg=0x7fffffffc6a0, pzErrMsg=0x7fffffffc588) at shell.c:1284
+#20 0x000000000040adbb in process_input (p=0x7fffffffc6a0, in=0x0)
+    at shell.c:3338
+---Type <return> to continue, or q <return> to quit---
+#21 0x000000000040c06e in main (argc=1, argv=0x7fffffffdd08) at shell.c:3837
+(gdb) 
+
+
+
+
+
+
+
+---SQLITE3 with SGX
+(gdb) p *pPager
+$4 = {pVfs = 0x7fffee4426a0 <aVfs.9021>, exclusiveMode = 0 '\000', 
+  journalMode = 0 '\000', useJournal = 1 '\001', noSync = 0 '\000', 
+  fullSync = 1 '\001', ckptSyncFlags = 2 '\002', walSyncFlags = 34 '"', 
+  syncFlags = 2 '\002', tempFile = 0 '\000', readOnly = 0 '\000', 
+  memDb = 0 '\000', eState = 1 '\001', eLock = 1 '\001', 
+  changeCountDone = 0 '\000', setMaster = 0 '\000', doNotSpill = 0 '\000', 
+  subjInMemory = 0 '\000', dbSize = 4294771224, dbOrigSize = 0, 
+  dbFileSize = 0, dbHintSize = 0, errCode = 0, nRec = 0, cksumInit = 0, 
+  nSubRec = 0, pInJournal = 0x0, fd = 0x7fffee447c90, 
+  jfd = 0x7fffee447d70, sjfd = 0x7fffee447d00, journalOff = 0, 
+  journalHdr = 0, pBackup = 0x0, aSavepoint = 0x0, nSavepoint = 0, 
+  dbFileVers = "\000\000\000\003\000\000\000\004\000\000\000\000\000\000\000", bUseFetch = 0 '\000', nMmapOut = 0, szMmap = 0, pMmapFreelist = 0x0, 
+  nExtra = 120, nReserve = 0, vfsFlags = 262, sectorSize = 512, 
+  pageSize = 1024, mxPgno = 4294771224, journalSizeLimit = -1, 
+  zFilename = 0x7fffee447de0 "/home/llt-xd/svn/secSqlite3/sgxSqlite3/ex1", 
+  zJournal = 0x7fffee447e0c "/home/llt-xd/svn/secSqlite3/sgxSqlite3/ex1-journal", xBusyHandler = 0x7fffee1854f3 <btreeInvokeBusyHandler>, 
+  pBusyHandlerArg = 0x7fffee447658, aStat = {0, 1, 0}, 
+  xReiniter = 0x7fffee1854a6 <pageReinit>, pTmpSpace = 0x7fffee447e88 "", 
+  pPCache = 0x7fffee447c40, pWal = 0x0, 
+  zWal = 0x7fffee447e3f "/home/llt-xd/svn/secSqlite3/sgxSqlite3/ex1-wal"}
+
+----without SGX
+$5 = {pVfs = 0x6be540 <aVfs.11182>, exclusiveMode = 0 '\000', journalMode = 0 '\000', useJournal = 1 '\001', noSync = 0 '\000', fullSync = 1 '\001', 
+  ckptSyncFlags = 2 '\002', walSyncFlags = 34 '"', syncFlags = 2 '\002', tempFile = 0 '\000', readOnly = 0 '\000', memDb = 0 '\000', 
+  eState = 1 '\001', eLock = 1 '\001', changeCountDone = 0 '\000', setMaster = 0 '\000', doNotSpill = 0 '\000', subjInMemory = 0 '\000', dbSize = 4, 
+  dbOrigSize = 0, dbFileSize = 0, dbHintSize = 0, errCode = 0, nRec = 0, cksumInit = 0, nSubRec = 0, pInJournal = 0x0, fd = 0x6c0c70, jfd = 0x6c0d50, 
+  sjfd = 0x6c0ce0, journalOff = 0, journalHdr = 0, pBackup = 0x0, aSavepoint = 0x0, nSavepoint = 0, 
+  dbFileVers = "\000\000\000\003\000\000\000\004\000\000\000\000\000\000\000", bUseFetch = 0 '\000', nMmapOut = 0, szMmap = 0, pMmapFreelist = 0x0, 
+  nExtra = 120, nReserve = 0, vfsFlags = 262, sectorSize = 512, pageSize = 1024, mxPgno = 1073741823, journalSizeLimit = -1, 
+  zFilename = 0x6c0dc0 "/home/llt-xd/opt/sqlite-amalgamation-3080402/ex1", 
+  zJournal = 0x6c0df2 "/home/llt-xd/opt/sqlite-amalgamation-3080402/ex1-journal", xBusyHandler = 0x42a67f <btreeInvokeBusyHandler>, 
+  pBusyHandlerArg = 0x6c0638, aStat = {0, 1, 0}, xReiniter = 0x42a632 <pageReinit>, pTmpSpace = 0x6c0e78 "", pPCache = 0x6c0c20, pWal = 0x0, 
+  zWal = 0x6c0e2b "/home/llt-xd/opt/sqlite-amalgamation-3080402/ex1-wal"}
+
+
