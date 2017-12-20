@@ -34,6 +34,7 @@
 #define _SQLITE3_H_
 #include <stdarg.h>     /* Needed for the definition of va_list */
 
+#include "../Include/user_types.h"
 /*
 ** Make sure we can call this stuff from C++.
 */

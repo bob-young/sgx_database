@@ -6,7 +6,9 @@
 #include <stdlib.h>     // exit();
 #include <string.h>     // memset();
 #include <sys/time.h>   // gettimeofday();
-#include <sqlite3.h>
+#include "../Include/user_types.h"
+#include "../Enclave/sqlite3.h"
+
 #include <time.h>
 #include <fcntl.h>
 //#include <sys/time.h>

@@ -1,42 +1,7 @@
-/*
- * Copyright (C) 2011-2016 Intel Corporation. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- */
-
-
 #include <stdarg.h>
 #include <string.h>
 #include <stdint.h>
-//#include "stdio.h"      /* vsnprintf */
-//#include "sgx_trts.h"
 
-//#include "vfslib/types.h"
 #include "Enclave_t.h"
 #include "Enclave.h"
 #include "vfslib/stdio.h"
@@ -47,8 +12,8 @@
 #include "vfslib/time.h"
 #include "vfslib/mman.h"
 #include "sqlite3.h"
-#include <sgx_tcrypto.h>
-
+//#include <sgx_tcrypto.h>
+#include "interface_crypto.h"
 //#define VFS_SGX_TEST
 
 #ifdef VFS_SGX_TEST
@@ -73,13 +38,7 @@ int callback(void *NotUsed, int argc, char **argv, char **azColName){
 int callback_enc(char *str, int argc, char **argv, char **azColName){
 
     int i,fp;
-    // int mlen = pOM->len;
-    // void *p = pOM->p;
-    // char str[MEM_BLOCK_SIZE]="A";
-    // str[mlen]='\0';
-    // fprintf(stdout,"callback mlen = %d\n",mlen);
-    // fprintf(stdout,"callback rlen = %d\n",pOM->rlen);
-    // memcpy(str, "A", 1);
+
     int s_len=MEM_BLOCK_SIZE-strlen(str);
    	// fprintf(stdout, "str: %s\n", str);
     fp = 0;
@@ -100,20 +59,7 @@ int callback_enc(char *str, int argc, char **argv, char **azColName){
     }
     fp += 1;
     strcat(str,"\n");
-    //fprintf(stdout, "reslut: %s\n", str);
-    // fprintf(stdout,"copy the reslut to outside \n");
-    // void *rp = (pOM->p)+(pOM->len)-(pOM->rlen);
-    // memcpy(rp, str, fp);
-    //fprintf(stdout,"rp:  %s\n",rp);
 
-    // if((pOM->len) > 0) {
-    // 	pOM->rlen = (pOM->rlen)-fp;
-    // }
-    // else {
-    // 	pOM->rlen = (pOM->len)-fp;
-    // }
-    //fprintf(stdout,"the rest of memory:%d\n",pOM->rlen);
-    // ocall_print(pOM,rp,fp);
     return 0;
 }
 
@@ -137,9 +83,9 @@ int transfer_cipher(
 
 	uint8_t p_dsts[length];
 	// fprintf(stdout,"%d\n",length);
-
-	sgx_aes_ctr_decrypt((sgx_aes_gcm_128bit_key_t *)key, 
-		cipher, length, ecount, ctr_inc_bits, p_dsts);
+	//enclave_encrypt(key,unsigned char* src,unsigned char* dest,int length);
+	enclave_decrypt(key,cipher,p_dsts,length);
+	//sgx_aes_ctr_decrypt((sgx_aes_gcm_128bit_key_t *)key,cipher, length, ecount, ctr_inc_bits, p_dsts);
 	p_dsts[length] = '\0';
     // fprintf(stdout, "SGX ecount (hex mode): ");
     // for(int i=0; i<16; i++){
@@ -160,14 +106,16 @@ int transfer_plaintext(
     unsigned char *ecount
 ){
 	char *zErrMsg = 0;
-	sgx_status_t rc;		
+	int rc;		
 	uint8_t p_ctr[16]= {0};
 
 	const uint32_t ctr_inc_bits = 128;
 	uint8_t p_dsts[length];
 
-	rc = sgx_aes_ctr_encrypt((sgx_aes_ctr_128bit_key_t *)key,
-		plaintext, length, ecount, ctr_inc_bits, p_dsts);
+//	rc = sgx_aes_ctr_encrypt((sgx_aes_ctr_128bit_key_t *)key,plaintext, length, ecount, ctr_inc_bits, p_dsts);
+
+	rc = enclave_encrypt(key,plaintext,p_dsts,length);
+
 	p_dsts[length] = '\0';
 
 	if( rc!=SGX_SUCCESS ){
@@ -381,9 +329,7 @@ int ecall_sqlite3_exec_enc(
 }
 
 
-// int ecall_sqlite3_get_table_cb(void *pArg, int nCol, char **argv, char **colv){
-// 	sqlite3_get_table_cb(void *pArg, int nCol, char **argv, char **colv);
-// }
+
 
 typedef struct TabResult {
   char **azResult;   /* Accumulated output */
@@ -396,144 +342,7 @@ typedef struct TabResult {
 } TabResult;
 
 
-// /*int ecall_sqlite3_get_table(
-// 	struct tDB *pdb,            /* The database on which the SQL executes */
-//   	const char *zSql,           /* The SQL to be executed */
-//  	char **Result,				/* Write the result table here */
-// 	size_t Result_len,
-//   	size_t Row,                	/* Write the number of rows in the result here */
-//   	size_t Column,             	/* Write the number of columns of result here */
-//  //  	char ***pazResult,
-//  //		size_t pazResult,
-//  //  	int *pnRow,
-//  //  	int *pnColumn,
-//   	char *errmsg,				/* Write error messages here */
-// 	size_t count_1,
-// 	size_t count_2
-// ){    
-//   	char *zErrMsg = 0;	     
-// 	sqlite3 **ppdb = (sqlite3 **)&(pdb->pDB);
-// 	//sqlite3 *db = *ppdb;
-// 	char **pResult;			/* Write the result table here */
 
-// 	int ret = sqlite3_get_table(*ppdb, zSql, &pResult, &Row, &Column, count_2 >0 ? &zErrMsg : NULL);
-
-// 	if (count_2 > 0 && zErrMsg != NULL) {
-// 		strncpy(errmsg, zErrMsg, count_2);
-// 	 	sqlite3_free(zErrMsg);
-// 	}
-
-// 	Result_len = (Row+1)*Column;
-
-//     int nIndex = Column;
-// /*  for(int i=0;i<Row;i++)
-//     {
-//         for(int j=0;j<nColumn;j++)
-//         {
-//             strOut+=pResult[j];
-//             strOut+=":";
-//             strOut+=pResult[nIndex];
-//             strOut+="\0";
-//             ++nIndex;
-//         }
-//     }*/
-//     for(int i=0;i<Result_len;i++)
-//     {
-//         strncpy(Result[i],pResult[i],strlen(pResult[i]));
-//     }
-
-
-
-// 	return ret;
-
- //    for(int n=0;n<Result_len;n++){
- //    	strncpy(pResult[n], (*pazResult)[n], sizeof((*pazResult)[n]));
- //    }
-
-	// sqlite3_free_table(*pazResult);
-	// return ret;
-
-	//int rc;
-  	//TabResult res;
-
- //  	*pResult = 0;
-  	// if( pnColumn ) *pnColumn = 0;
-  	// if( pnRow ) *pnRow = 0;
-  	// if( pzErrMsg ) *pzErrMsg = 0;
-
-  	// if( pResult==0 ){
-  	//    db->errCode = SQLITE_NOMEM;
-  	//    return SQLITE_NOMEM;
-  	// }
-
- //   	res.zErrMsg = 0;
- //  	res.nRow = 0;
- //  	res.nColumn = 0;
- //  	res.nData = 1;
- //  	res.nAlloc = 20;
- //  	res.rc = SQLITE_OK;
- //  	res.azResult = (char **) sqlite3_malloc(sizeof (char*)*res.nAlloc);
-
- //  	if( res.azResult==0 ){
- //     	//db->errCode = SQLITE_NOMEM;
- //     	return SQLITE_NOMEM;
- //  	}
-
- //  	res.azResult[0] = 0;
-
- //  	rc = sqlite3_exec(db, zSql, callback, &res, count >0 ? &zErrMsg : NULL);
- //  	if (count > 0 && zErrMsg != NULL) {
-	// 	strncpy(errmsg, zErrMsg, count);
-	// 	sqlite3_free(zErrMsg);
-	// }
- //  	assert( sizeof(res.azResult[0])>= sizeof(res.nData) );
- //  	res.azResult[0] = SQLITE_INT_TO_PTR(res.nData);
- //  	if( (rc&0xff)==SQLITE_ABORT ){
- //    	sqlite3_free_table(&res.azResult[1]);
- //    	if( res.zErrMsg ){
- //      	if( zErrMsg ){
- //        	sqlite3_free(zErrMsg);
- //        	zErrMsg = sqlite3_mprintf("%s",res.zErrMsg);
- //      	}
- //      	sqlite3_free(res.zErrMsg);
- //    	}
- //    	//db->errCode = res.rc;  /* Assume 32-bit assignment is atomic */
- //    	return res.rc;
- //  	}
- //  	sqlite3_free(res.zErrMsg);
- //  	if( rc!=SQLITE_OK ){
- //    	sqlite3_free_table(&res.azResult[1]);
- //    	return rc;
- //  	}
- //  	if( res.nAlloc>res.nData ){
- //    	char **azNew;
- //    	azNew = (char **)sqlite3_realloc( res.azResult, sizeof(char*)*res.nData );
- //    	if( azNew==0 ){
- //      	sqlite3_free_table(&res.azResult[1]);
- //      	//db->errCode = SQLITE_NOMEM;
- //      	return SQLITE_NOMEM;
- //    	}
- //    	res.azResult = azNew;
- //  	}
- //  	*pResult = res.azResult[1];
-
- //  	Column = res.nColumn;
- //  	Row = res.nRow;
- //  	sqlite3_free_table(&res.azResult[1]);
-//}
-
-// void ecall_sqlite3_free_table(
-//   char **azResult             //Result returned from from sqlite3_get_table() 
-// ){
-//   	if( azResult ){
-//   		sqlite3_free_table(azResult);
-// 	}
-// }
-
-// char** ecall_sqlite3_malloc(){
-
-
-// }
 
 int ecall_sqlite3_close(struct tDB *pdb){
 	sqlite3 **ppdb = (sqlite3 **)&(pdb->pDB);
@@ -570,33 +379,26 @@ int ecall_sqlite3_exec_once(const char *dbname, const char *sql){
 	return 0;
 }
 
-
+//0
 int ecall_sqlite3_ctr_encrypt(const char *sql, const char *sgx_ctr_key, uint8_t *p_dst, size_t count){
-
-	sgx_status_t rc;
+	int rc = -1;
 	char *zErrMsg = 0;
 
-	const uint8_t *p_src = (const uint8_t *)sql;
-	const uint32_t src_len = strlen(sql);
-	uint8_t p_ctr[16]= {0};
-	const uint32_t ctr_inc_bits = 128;
-	uint8_t *sgx_ctr_keys = (uint8_t *)malloc(16*sizeof(char));
-	memcpy(sgx_ctr_keys,sgx_ctr_key,16);
-	uint8_t *p_dsts = (uint8_t *)malloc(src_len*sizeof(char));
+	int src_len = strlen(sql);
+	unsigned char *p_src = (unsigned char*)malloc(src_len); 
+	memcpy(p_src,sql,src_len);	
 
-	rc =sgx_aes_ctr_encrypt((sgx_aes_ctr_128bit_key_t *)sgx_ctr_keys, p_src, src_len, p_ctr, ctr_inc_bits, p_dsts);
+	unsigned char *sgx_keys = (unsigned char *)malloc(Enclave_Key_Size*sizeof(char));
+	memcpy(sgx_keys,sgx_ctr_key,Enclave_Key_Size);
 
-	if( rc!=SGX_SUCCESS ){
+	unsigned char *p_dsts = (unsigned char *)malloc(src_len*sizeof(char));
+
+	rc = enclave_encrypt(sgx_keys,p_src,p_dsts,src_len);
+
+	if(rc != 0){
 	  fprintf(stderr,"SQL error: %s\n", zErrMsg);
 	  sqlite3_free(zErrMsg);
 	}
-
-	// sgx_status_t rc2;
-
-	// uint8_t *p_dsts2 = (uint8_t *)malloc(src_len*sizeof(char));
-	// uint8_t p_ctr2[16]= {0};
-
-	// rc2 = sgx_aes_ctr_decrypt((sgx_aes_gcm_128bit_key_t *)sgx_ctr_keys, p_dsts, src_len, p_ctr2, ctr_inc_bits, p_dsts2);
 
 	fprintf(stdout, "sgx cipher: ");
 	for(int i=0; i<src_len; i++){
@@ -604,40 +406,26 @@ int ecall_sqlite3_ctr_encrypt(const char *sql, const char *sgx_ctr_key, uint8_t 
         fprintf(stdout, "%02x ", p_dsts[i]);
     }
     fprintf(stdout, "\n");
-
-	// fprintf(stdout, "sgx decrypted: ");
- //    for(int i=0; i<src_len; i++){
- //    	// p_dst[i] = p_dsts2[i];
- //        fprintf(stdout, "%c", p_dsts2[i]);
- //    }
- //    fprintf(stdout, "\n");
-
-
-	// if( rc2!=SGX_SUCCESS ){
-	//   fprintf(stderr,"SQL error: %s\n", zErrMsg);
-	//   sqlite3_free(zErrMsg);
-	// }
-
+    free(p_src);
+    free(sgx_keys);
 	return 0;
 }
 
 
 int ecall_sqlite3_ctr_decrypt(unsigned char *cipher, const char *sgx_ctr_key, uint8_t *p_dst,size_t count){
-	
+	int rc = -1;
 	char *zErrMsg = 0;
-	sgx_status_t rc;
 
+	int src_len = strlen((char*)cipher);
+	unsigned char *p_src = (unsigned char*)malloc(src_len); 
+	memcpy(p_src,cipher,src_len);
 
-	uint8_t *sgx_ctr_keys = (uint8_t *)malloc(16*sizeof(char));
-	memcpy(sgx_ctr_keys,sgx_ctr_key,16);
-	const uint8_t *p_src = (const uint8_t *)cipher;
-	uint8_t p_ctr[16]= {0};
+	unsigned char *sgx_keys = (unsigned char *)malloc(Enclave_Key_Size*sizeof(char));
+	memcpy(sgx_keys,sgx_ctr_key,Enclave_Key_Size);
 
-	const uint32_t ctr_inc_bits = 128;
+	unsigned char *p_dsts = (unsigned char *)malloc(count*sizeof(char));
 
-	uint8_t *p_dsts = (uint8_t *)malloc(count*sizeof(char));
-
-	rc = sgx_aes_ctr_decrypt((sgx_aes_gcm_128bit_key_t *)sgx_ctr_keys, p_src, count, p_ctr, ctr_inc_bits, p_dsts);
+	rc = enclave_encrypt(sgx_keys,p_src,p_dsts,count);
 
 	fprintf(stdout, "sgx p_dsts: ");
 	for(int i=0; i<count; i++){
@@ -645,19 +433,19 @@ int ecall_sqlite3_ctr_decrypt(unsigned char *cipher, const char *sgx_ctr_key, ui
         fprintf(stdout, "%c", p_dsts[i]);
     }
     fprintf(stdout, "\n");
-
 	if( rc!=SGX_SUCCESS ){
 	  fprintf(stderr,"SQL error: %s\n", zErrMsg);
 	  sqlite3_free(zErrMsg);
 	}
-
+    free(p_src);
+    free(sgx_keys);
 	return 0;
 }
 
 int ecall_sqlite3_ctr_decrypt_2(unsigned char *ecount,unsigned char *cipher, const unsigned char *sgx_ctr_key, uint8_t *p_dst,size_t count){
 	
 	char *zErrMsg = 0;
-	sgx_status_t rc;
+	int rc;
 
 
 	uint8_t *sgx_ctr_keys = (uint8_t *)malloc(16*sizeof(char));
@@ -675,7 +463,8 @@ int ecall_sqlite3_ctr_decrypt_2(unsigned char *ecount,unsigned char *cipher, con
     }
     fprintf(stdout, "\n");
 
-	rc = sgx_aes_ctr_decrypt((sgx_aes_gcm_128bit_key_t *)sgx_ctr_keys, p_src, count, ecount, ctr_inc_bits, p_dsts);
+	//rc = sgx_aes_ctr_decrypt((sgx_aes_gcm_128bit_key_t *)sgx_ctr_keys, p_src, count, ecount, ctr_inc_bits, p_dsts);
+	rc = enclave_encrypt(sgx_ctr_keys,p_src,p_dsts,count);
 
 	fprintf(stdout, "sgx cipher: ");
 	for(int i=0; i<count; i++){
@@ -711,8 +500,8 @@ void ecall_transfer_cipher(const unsigned char *key,
 	uint8_t p_dsts[length];
 	fprintf(stdout,"%d\n",length);
 
-	sgx_aes_ctr_decrypt((sgx_aes_ctr_128bit_key_t *)key, 
-		cipher, length, ecount, ctr_inc_bits, p_dsts);
+	//sgx_aes_ctr_decrypt((sgx_aes_ctr_128bit_key_t *)key, cipher, length, ecount, ctr_inc_bits, p_dsts);
+	enclave_decrypt(key,cipher,p_dsts,length);
 	p_dsts[length] = '\0';
     fprintf(stdout, "SGX ecount (hex mode): ");
     for(int i=0; i<16; i++){
@@ -727,17 +516,3 @@ void ecall_transfer_cipher(const unsigned char *key,
     fprintf(stdout, "\n");
     fprintf(stdout, "SGX Plain text: %s\n", p_dsts);
 }
-
-//oss test
-
-/*void ecall_inter_sqlite3_mprintf(const char *zFormat, unsigned char* zbuf, char *zsql, size_t count){
-	char * rt = sqlite3_mprintf(zFormat, zbuf);
-	count = strlen(rt);
-	strncpy(zsql, rt, count);
-}*/
-
-/*void ecall_sqlite3_free (void* p, size_t count){
-	//length = sizeof (p);
-	sqlite3_free(p);
-	//count = sizeof(p);
-}*/

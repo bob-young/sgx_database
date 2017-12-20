@@ -1,43 +1,21 @@
-#
-# Copyright (C) 2011-2016 Intel Corporation. All rights reserved.
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#
-#   * Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
-#   * Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
-#   * Neither the name of Intel Corporation nor the names of its
-#     contributors may be used to endorse or promote products derived
-#     from this software without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#
-#
 
 ######### SQLITE3 SUPPORT ########
 #SQLITE3_SUPPORT ?= 0
 SQLITE3_SUPPORT ?= 1
 SQLITE3_OPT_CONFIG := -DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION -DSQLITE_OMIT_LOCALTIME -DSQLITE_DEFAULT_MMAP_SIZE=0 -DSQLITE_HAS_CODEC
 VFS_SGX_TEST ?= 0
-######## SGX SDK Settings ########
 
+#####################################
+######### IPP Settings  ##########
+IPP_Include_Path := /opt/intel/compilers_and_libraries_2018.1.163/linux/ippcp/include/
+IPP_Link_Path := /opt/intel/compilers_and_libraries_2018.1.163/linux/ippcp/lib/intel64_lin/
+IPP_Link_Flag := -L$(IPP_Link_Path) -lippcp 
+IPP_Link_Static := -L./TrustedLib -lippcp
+
+#####################################
+######### SGX SDK Settings ##########
 SGX_SDK ?= /opt/intel/sgxsdk
-SGX_MODE ?= HW
+SGX_MODE ?= SIM
 SGX_ARCH ?= x64
 SGX_DEBUG ?= 1
 
@@ -79,10 +57,10 @@ else
 	Urts_Library_Name := sgx_urts
 endif
 
-App_Cpp_Files := App/sqlite3Client.cpp $(wildcard App/vfslib/*.cpp)
+App_Cpp_Files := App/sqlite3Client.cpp $(wildcard App/vfslib/*.cpp) $(wildcard App/ipp/*.cpp) 
 #App/sqlite3Client.cpp
 # $(wildcard App/Edger8rSyntax/*.cpp) $(wildcard App/TrustedLibrary/*.cpp)
-App_Include_Paths := -IInclude -IApp -I$(SGX_SDK)/include
+App_Include_Paths := -IInclude -IApp -I$(SGX_SDK)/include -IApp/ipp -IApp/enclave -I$(IPP_Include_Path)
 
 App_C_Flags := $(SGX_COMMON_CFLAGS) -lcrypto -fPIC -Wno-attributes $(App_Include_Paths) 
 
@@ -105,7 +83,7 @@ endif
 endif
 
 App_Cpp_Flags := $(App_C_Flags) -std=c++11
-App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) -lpthread -lcrypto
+App_Link_Flags := $(SGX_COMMON_CFLAGS) -L$(SGX_LIBRARY_PATH) -l$(Urts_Library_Name) $(IPP_Link_Static) -lpthread -lcrypto
 
 ifneq ($(SGX_MODE), HW)
 	App_Link_Flags += -lsgx_uae_service_sim
@@ -128,10 +106,10 @@ else
 endif
 Crypto_Library_Name := sgx_tcrypto
 
-Enclave_Cpp_Files := $(wildcard Enclave/*.cpp) $(wildcard Enclave/vfslib/*.cpp) $(wildcard Enclave/tstl2cl/*.cpp)
+Enclave_Cpp_Files := $(wildcard Enclave/*.cpp) $(wildcard Enclave/vfslib/*.cpp) $(wildcard Enclave/tstl2cl/*.cpp) $(wildcard Enclave/ipp/*.cpp) $(wildcard Enclave/interface/*.cpp) 
 #Enclave/Enclave.cpp
 # $(wildcard Enclave/Edger8rSyntax/*.cpp) $(wildcard Enclave/TrustedLibrary/*.cpp)
-Enclave_Include_Paths := -IInclude -IEnclave -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport
+Enclave_Include_Paths := -IInclude -IEnclave -I$(SGX_SDK)/include -I$(SGX_SDK)/include/tlibc -I$(SGX_SDK)/include/stlport -IEnclave/ipp -I$(IPP_Include_Path) -IEnclave/interface
 
 Enclave_C_Flags := $(SGX_COMMON_CFLAGS) -nostdinc -fvisibility=hidden -fpie -fstack-protector $(Enclave_Include_Paths)
 ifeq ($(SQLITE3_SUPPORT), 1)
@@ -268,7 +246,7 @@ else
 $(Enclave_Name): Enclave/Enclave_t.o $(Enclave_Cpp_Objects)
 	@echo "SQLITE3 not SUPPORTED!"
 endif
-	@$(CXX) $^ -o $@ $(Enclave_Link_Flags)
+	@$(CXX) $^ -o $@ $(Enclave_Link_Flags) $(IPP_Link_Flag)
 	@echo "LINK =>  $@"
 
 $(Signed_Enclave_Name): $(Enclave_Name)

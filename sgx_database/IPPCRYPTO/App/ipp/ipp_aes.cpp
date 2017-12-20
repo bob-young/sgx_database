@@ -76,3 +76,8 @@ IppStatus ipp_aes::decrypt(unsigned char* src,unsigned char* dest,int length)
 	}
 	return istate;
 }
+
+void ipp_aes::ipp_free()
+{
+	free(gcm_context);
+}

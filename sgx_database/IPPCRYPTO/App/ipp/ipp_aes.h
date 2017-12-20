@@ -15,6 +15,7 @@ public:
 	IppStatus encrypt(unsigned char* src,unsigned char* dest,int length);
 	IppStatus decrypt(unsigned char* src,unsigned char* dest,int length);
 	IppStatus reset();
+	void ipp_free();
 	int block_size=512;
 private:
 	int AES_GCM_ContextSize=0;

@@ -11,9 +11,10 @@
 #define errlist_len 15
 
 
-	IppStatus init(unsigned char* pwd,int pwdlen,unsigned char* piv,int pivlen);
-	IppStatus encrypt(unsigned char* src,unsigned char* dest,int length);
-	IppStatus decrypt(unsigned char* src,unsigned char* dest,int length);
-	IppStatus reset();
-
+	IppStatus ipp_init(const unsigned char* pwd,int pwdlen,unsigned char* piv,int pivlen);
+	IppStatus ipp_encrypt(const unsigned char* src,unsigned char* dest,int length);
+	IppStatus ipp_decrypt(const unsigned char* src,unsigned char* dest,int length);
+	IppStatus ipp_reset();
+	void ipp_free();
+	
 #endif

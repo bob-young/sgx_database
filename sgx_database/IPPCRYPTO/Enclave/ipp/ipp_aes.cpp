@@ -9,18 +9,18 @@
 int block_size=512;
 int AES_GCM_ContextSize=0;
 IppsAES_GCMState* gcm_context;
-unsigned char* t_pwd;
+const unsigned char* t_pwd;
 int t_pwdlen;
 unsigned char* t_piv;
 int t_pivlen;
-int ipp_init;
+int ipp_init_flag;
 
-IppStatus init(unsigned char* pwd,int pwdlen,unsigned char* piv,int pivlen)
+IppStatus ipp_init(const unsigned char* pwd,int pwdlen,unsigned char* piv,int pivlen)
 {
 	IppStatus istate;
 	if(pwdlen!=16 && pwdlen!=24 && pwdlen!=32){
 		//printf("private key length error\n");
-		ocall_print_string("private key length error");
+		//ocall_print_string("private key length error");
 		return -1;
 	}
 	t_pwd=pwd;
@@ -31,8 +31,8 @@ IppStatus init(unsigned char* pwd,int pwdlen,unsigned char* piv,int pivlen)
 	istate=ippsAES_GCMInit(t_pwd,t_pwdlen,gcm_context,AES_GCM_ContextSize);
 	if(istate != 0){
 		//printf("ipp aes init error:%s\n",ippcpGetStatusString(istate));
-		ocall_print_string("ipp aes init error:");
-		ocall_print_string(ippcpGetStatusString(istate));
+		//ocall_print_string("ipp aes init error:");
+		//ocall_print_string(ippcpGetStatusString(istate));
 		return -1;	
 	}
 	if(piv == NULL){
@@ -51,12 +51,12 @@ IppStatus init(unsigned char* pwd,int pwdlen,unsigned char* piv,int pivlen)
 	return istate;
 }
 
-IppStatus reset()
+IppStatus ipp_reset()
 {
-	return init(t_pwd,t_pwdlen,t_piv,t_pivlen);
+	return ipp_init(t_pwd,t_pwdlen,t_piv,t_pivlen);
 }
 
-IppStatus encrypt(unsigned char* src,unsigned char* dest,int length)
+IppStatus ipp_encrypt(const unsigned char* src,unsigned char* dest,int length)
 {
 	IppStatus istate;
 	for(int i=0;i<length;i=i+block_size){
@@ -68,15 +68,15 @@ IppStatus encrypt(unsigned char* src,unsigned char* dest,int length)
 		
 		if(istate != 0){
 			//printf("ipp aes encrypt error %s\n",ippcpGetStatusString(istate));
-			ocall_print_string("ipp aes encrypt error:");
-			ocall_print_string(ippcpGetStatusString(istate));
+			//ocall_print_string("ipp aes encrypt error:");
+			//ocall_print_string(ippcpGetStatusString(istate));
 			return istate;	
 		}
 	}
 	return istate;
 }
 
-IppStatus decrypt(unsigned char* src,unsigned char* dest,int length)
+IppStatus ipp_decrypt(const unsigned char* src,unsigned char* dest,int length)
 {
 	IppStatus istate;
 	for(int i=0;i<length;i=i+block_size){
@@ -87,11 +87,17 @@ IppStatus decrypt(unsigned char* src,unsigned char* dest,int length)
 		}
 		
 		if(istate != 0){
-			ocall_print_string("ipp aes decrypt error:");
-			ocall_print_string(ippcpGetStatusString(istate));
+			//ocall_print_string("ipp aes decrypt error:");
+			//ocall_print_string(ippcpGetStatusString(istate));
 			//printf("ipp aes decrypt error %s\n",ippcpGetStatusString(istate));
 			return istate;	
 		}
 	}
 	return istate;
+}
+
+void ipp_free()
+{
+	free(gcm_context);
+	return ;
 }

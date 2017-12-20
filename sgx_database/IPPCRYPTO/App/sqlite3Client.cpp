@@ -1,35 +1,3 @@
-/*
- * Copyright (C) 2011-2016 Intel Corporation. All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- */
-
-
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
@@ -51,18 +19,12 @@
 #include <stdlib.h>
 #include <math.h>
 
-
+#include "ipp_aes.h"
 // #define XDSGX_BLOCK_SIZE  AES_BLOCK_SIZE
 #define XDSGX_BLOCK_SIZE  65535
 #define AES_KEY_SIZE 16
 #define MEM_BLOCK_SIZE 1024*8   //1k
-// unsigned const char enc_key[AES_KEY_SIZE+1] = "1234567812345678";
-// #define OPENSSL_CTR_TEST
-// #define SGX_CTR_TEST
-//#define SGX_GET_TABLE_TEST
-//#include "md5.c"
-//#include "md5.h"
-//#define SGX_SQLITE_TIME_TEST
+
 
 /* Global EID shared by multiple threads */
 sgx_enclave_id_t global_eid = 0;
@@ -73,7 +35,7 @@ typedef struct _sgx_errlist_t {
     const char *sug; /* Suggestion */
 } sgx_errlist_t;
 
-unsigned char * TextDecrypt(const unsigned char* enc_key, unsigned char* cypherText,int bytes_read,uint8_t* ecount);
+unsigned char * TextDecrypt(unsigned char* enc_key, unsigned char* cypherText,int bytes_read,uint8_t* ecount);
 
 /* Error code returned by sgx_create_enclave */
 static sgx_errlist_t sgx_errlist[] = {
@@ -252,7 +214,7 @@ int ocall_rtreslut(char *title, size_t count, char *r, size_t size){
     printf("%s = %s\t", title, r ? r : "NULL");
 
 }
-
+//-------------------------------------------------------------------------------------------------------------------------------
 int ocall_reslutcp(OMem* mem,unsigned char* str,int s_len,uint8_t* ecount){
     char *p = (char*)malloc(mem->len);
     memcpy(p,str,s_len);
@@ -263,7 +225,7 @@ int ocall_reslutcp(OMem* mem,unsigned char* str,int s_len,uint8_t* ecount){
     // }
     // fprintf(stdout, "\n");
 
-    unsigned const char enc_key[AES_KEY_SIZE+1] = "1234567812345678";
+    unsigned char enc_key[AES_KEY_SIZE+1] = "1234567812345678";
     uint8_t ivec[16]= {0};
 
     str = TextDecrypt(enc_key, str, s_len, ivec);
@@ -272,11 +234,6 @@ int ocall_reslutcp(OMem* mem,unsigned char* str,int s_len,uint8_t* ecount){
         printf("%c", str[i]);
     }
     printf("\n");
-    // printf("--------------------------------pout:----------------------------------\n");
-    // for(i=0;i<s_len;i++){
-    //     printf("%c",p[i]);
-    // }
-    // printf("\n");
     mem->p = p;
     return 0;
 }
@@ -292,39 +249,22 @@ void ocall_malloc(OMem* mem){
 
 
 
-int aes_encrypt(char *key_string,const char *sql,unsigned char *out1){
-    AES_KEY  aes;
-    int sql_len = strlen(sql);
+int aes_encrypt(char *key_string,char *sql,unsigned char *out1)
+{
+	int sql_len = strlen(sql);
     printf("sql_len = %d\n", sql_len);
-    int n=sql_len/16;
-    if (AES_set_encrypt_key((unsigned char*)key_string, 128, &aes) < 0) {
-        fprintf(stderr, "Unable to set encryption key in AES\n");
-        return 0;
-    }
-    unsigned char* tmpe=(unsigned char*)malloc(sizeof(unsigned char)*16*(n+1));
-    memcpy(tmpe,sql,sql_len);
-    for(int m=sql_len;m<(n+1)*16;m++){
-        tmpe[m]='\0';
-    }
-    for(int m=0;m<=n;m++){
-        AES_encrypt(tmpe+16*m,out1+16*m,&aes);
-    }
+    ipp_aes ippaes;
+    ippaes.init((unsigned char*)key_string,16,NULL,0);
+    ippaes.encrypt((unsigned char*)sql,out1,sql_len);
     return 1;
 }
 
-
 int aes_decrypt(char *key_string, unsigned char *out1, unsigned char *out2){
-    AES_KEY  aes;
     int sql_len = strlen((char *)out1);
     printf("sql_len = %d\n", sql_len);
-    int n = sql_len/16;
-    if (AES_set_decrypt_key((unsigned char*)key_string, 128, &aes) < 0) {
-        fprintf(stderr, "Unable to set encryption key in AES\n");
-        return 0;
-    }
-    for(int m=0;m<=n;m++){
-        AES_decrypt(out1+16*m,out2+16*m,&aes);
-    }
+    ipp_aes ippaes;
+    ippaes.init((unsigned char*)key_string,16,NULL,0);
+    ippaes.decrypt(out1,out2,sql_len);
     return 1;
 }
 
@@ -345,7 +285,7 @@ struct ctr_state state;
 
 
 
-int init_ctr(struct ctr_state *state, const unsigned char iv[16])
+int init_ctr(struct ctr_state *state,  unsigned char iv[16])
 {        
     /*O aes_ctr128_encrypt exige um 'num' e um 'ecount' definidos a zero na primeira chamada. */
     state->num = 0;
@@ -358,90 +298,36 @@ int init_ctr(struct ctr_state *state, const unsigned char iv[16])
     memcpy(state->ivec, iv, 16); //16?
 }
 
-unsigned char * TextEncrypt(const unsigned char* enc_key, const unsigned char * text, int bytes_read)
-{ 
-    //Cria vector com valores aleatórios
-    if(!RAND_bytes(iv, AES_BLOCK_SIZE))
-    {
-        printf("Erro\n");
-        exit(1);    
-    }
+unsigned char * TextEncrypt(unsigned char* enc_key, unsigned char * text, int bytes_read)
+{
+    memset(outdata,0,XDSGX_BLOCK_SIZE);
+    int text_len = strlen((char *)text);
+    ipp_aes ippaes;
+    ippaes.init(enc_key,16,NULL,0);
+    ippaes.encrypt(text,outdata,bytes_read);
 
-    //printf("enc_key = %s\n",enc_key);
-    //Inicializa a chave de encriptação
-    if (AES_set_encrypt_key(enc_key, 128, &key) < 0)
-    {
-        fprintf(stderr, "Unable to set encryption key in AES");
-        exit(1);
-    }
-/*    if (AES_set_decrypt_key(enc_key, 128, &dec_key) < 0)
-    {
-        fprintf(stderr, "Unable to set encryption key in AES");
-        exit(1);
-    }*/
-
-    init_ctr(&state, iv); //Chamada do contador
-
-    // printf("state.ivec: ");
-    // for(int i=0; i<AES_BLOCK_SIZE; i++){
-    //     printf("%02x ", state.ivec[i]);
-    // }
-    // printf("\n");
-    // printf("state.ecount: ");
-    // for(int i=0; i<AES_BLOCK_SIZE; i++){
-    //     printf("%02x ", state.ecount[i]);
-    // }
-    // printf("\n");
-    // printf("state.num:%d\n",state.num);
-
-    // //AES_set_encrypt_key(enc_key, 128, &key);    
-    // printf("state.num:%d\n",state.num);
-    //Encripta em blocos de 16 bytes e guarda o texto cifrado numa string -> outdata
-    AES_ctr128_encrypt(text, outdata, bytes_read, &key, state.ivec, state.ecount, &state.num);
-    printf("soutdata: ");
+    printf("s_outdata: ");
     for(int i=0; i<bytes_read; i++){
         printf("%02x ", outdata[i]);
     }
     printf("\n");
-    memcpy(state.ivec, iv, 16);
-
     fflush(stdin);
     return outdata;
 }
 
-unsigned char * TextDecrypt(const unsigned char* enc_key, unsigned char* cypherText,int bytes_read, uint8_t* ivec)
+unsigned char * TextDecrypt(unsigned char* enc_key, unsigned char* cypherText,int bytes_read, uint8_t* ivec)
 {       
+    memset(outdata,0,XDSGX_BLOCK_SIZE);
+    int text_len=strlen((char*)cypherText);
+    ipp_aes ippaes;
+    ippaes.init(enc_key,16,NULL,0);
+    ippaes.decrypt(cypherText,outdata,bytes_read);
 
-    //Inicialização da Chave de encriptação 
-    // if (AES_set_encrypt_key(enc_key, 128, &key) < 0)
-    // {
-    //     fprintf(stderr, "Unable to set decryption key in AES.");
-    //     exit(1);
-    // }
-
-    init_ctr(&state, ivec);//Chamada do contador
-    // printf("TextDecrypt state.num=%d,ivec=%d,ecount=%d\n",state.num,state.ivec,state.ecount);
-    //memcpy(state.ivec, iv, 16);
-    //Encripta em blocos de 16 bytes e escreve o ficheiro output.txt cifrado         
-    //bytes_read = strlen(cypherText);    
-    if (AES_set_decrypt_key(enc_key, 128, &dec_key) < 0)
-    {
-        fprintf(stderr, "Unable to set encryption key in AES");
-        exit(1);
-    }
-    // state.ivec = ecount;
-    //memcpy(state.ivec, ecount, 16);
-    AES_ctr128_encrypt(cypherText, outdata, bytes_read, &key, state.ivec, state.ecount, &state.num);
-    // printf("decrypt data in TextDecrypt: ");
-    // for(int i=0; i<bytes_read; i++){
-    //     printf("%c", outdata[i]);
-    // }
-    // printf("\n");
     fflush(stdin);
     return outdata;
 }
 
-int sqlite3_exec_encrypt(const char *dbname, const char *sql, const unsigned char *enc_key){
+int sqlite3_exec_encrypt(char *dbname, char *sql, unsigned char *enc_key){
 
     int retval;
     /* Initialize the enclave */
@@ -460,9 +346,9 @@ int sqlite3_exec_encrypt(const char *dbname, const char *sql, const unsigned cha
     struct tDB tdb;
 
     fprintf(stdout,"\n---ENCRPT SQL Query Start----\n");
-    const unsigned char * cipherdb;
+    unsigned char * cipherdb;
     int len = strlen(dbname);
-    cipherdb = TextEncrypt(enc_key, (const unsigned char *)dbname,len);
+    cipherdb = TextEncrypt(enc_key, (unsigned char *)dbname,len);
     if ( (rc = ecall_sqlite3_open_enc(global_eid, &rc, cipherdb, len, state.ivec, &tdb)) 
             != SGX_SUCCESS ) {
         abort();
@@ -487,14 +373,11 @@ int sqlite3_exec_encrypt(const char *dbname, const char *sql, const unsigned cha
     //sql2 encrypt
     unsigned char pm[8];
     int m_len;
-    const unsigned char * ciphersql;
+    unsigned char * ciphersql;
     len = strlen(sql);
 
-    ciphersql = TextEncrypt(enc_key, (const unsigned char *)sql,len);
-    // char strout[MEM_BLOCK_SIZE];
-    // size_t count2 = MEM_BLOCK_SIZE;
-    // ret = ecall_sqlite3_exec_enc(
-    //     global_eid, &rc, &tdb, ciphersql2, len, state.ivec, errmsg, sizeof(errmsg),pm, m_len, strout, count2);
+    ciphersql = TextEncrypt(enc_key, (unsigned char *)sql,len);
+
     ret = ecall_sqlite3_exec_enc(
         global_eid, &rc, &tdb, ciphersql, len, state.ivec, errmsg, sizeof(errmsg),pm, m_len);    
     if ( ret != SGX_SUCCESS) {
@@ -505,23 +388,9 @@ int sqlite3_exec_encrypt(const char *dbname, const char *sql, const unsigned cha
       fprintf(stderr,"SQL error: %s\n", errmsg);
     }
     int i;
-    // printf("strout");
-    // len = strlen(strout);
-    // for(i=0;i<len;i++){
-    //     printf("%c",strout[i]);
-    // }
-    // printf("\n");
-    printf("outd====%p\n",(void*)(*(uint64_t*)pm));
-    //print the encrypt reslut in the malloc memory
-/*    printf("pmout:");
-    char* upm=(char*)*(uint64_t*)pm;
-    for(i=0;i<m_len;i++){
-        printf("%c", upm[i]);
-    }
-    printf("\n");*/
 
-    // printf("pm free\n");
-    // free(pm);
+    printf("outd====%p\n",(void*)(*(uint64_t*)pm));
+
     fprintf(stdout,"---ENCRPT SQL Query END----\n");
     return 0;
 }
@@ -535,12 +404,12 @@ int SGX_CDECL main(int argc, char *argv[])
 
     printf("argc: %u\n", argc);
     sgx_status_t ret = SGX_ERROR_UNEXPECTED;
-    const char *dbname = argv[1];
-    const char *sql = argv[2];
+    char *dbname = argv[1];
+    char *sql = argv[2];
     char ctr_rand_key[AES_KEY_SIZE]={0};
-    const unsigned char key[17] = "1234567812345678";
+    unsigned char key[17] = "1234567812345678";
 
-    const char *encryp = NULL;
+    char *encryp = NULL;
     char errmsg[50] = {'\0'};
 #ifdef SGX_SQLITE_TIME_TEST 
     if(initialize_enclave() < 0){
@@ -595,22 +464,6 @@ int SGX_CDECL main(int argc, char *argv[])
         if ( sqlite3_exec_encrypt(dbname, sql, key)!=0) {
             abort();
         }
-/*        if ( sqlite3_exec_encrypt(dbname, sql2, key)!=0) {
-            abort();
-        }*/
-        // int fd = -1;
-        // int size;
-        // unsigned long filesize = -1;
-        // char fname[60] = {'\0'};
-        // char buffer[100];
-        // strncpy(fname, "./test_m/", 7);
-        // strncat(fname, "test.txt", 8);
-
-        // fprintf(stdout, "app open file %s\n",fname);
-        // fd = open(fname, O_RDONLY);
-        // size = read(fd,buffer,sizeof(buffer));
-        // close(fd);
-        //printf("%s",buffer);
         return 0;
     }else{
         printf("crypt or not: NO");
@@ -655,28 +508,7 @@ int SGX_CDECL main(int argc, char *argv[])
     }
     fprintf(stdout, "DATABASE OPENED!\n");
 
-    //sql encrypt
 
-    //Two ways to sexecute the sql statements
-
-    //exec();
-    /*    char *zFirstCmd = 0;
-    for(int i=2; i<argc; i++){
-        zFirstCmd = argv[i];
-        if( zFirstCmd[i]=='.' ){
-            rc = do_meta_command(zFirstCmd, &data);
-            if( rc==2 ) rc = 0;
-        }
-        else{
-            fprintf(stdout, "run with exec:\n");
-            if ( (ret = ecall_sqlite3_exec(global_eid, &rc, &tdb, zFirstCmd[i], errmsg, sizeof(errmsg)))!= SGX_SUCCESS) {
-                 abort();
-            }
-            if( rc!=0 ){
-                fprintf(stderr,"SQL error: %s\n", errmsg);
-            }
-        }
-    }*/
     fprintf(stdout, "run with exec:\n");
     if ( (ret = ecall_sqlite3_exec(global_eid, &rc, &tdb, sql, errmsg, sizeof(errmsg)))
                 != SGX_SUCCESS) {
@@ -717,7 +549,7 @@ int SGX_CDECL main(int argc, char *argv[])
 
 #ifdef OPENSSL_AES_TEST
 
-    char *key_aes = "1234567890";
+    char *key_aes = "1111222233334444";
 
     int i = 0;
     int sql_len = strlen(sql);
@@ -752,7 +584,7 @@ int SGX_CDECL main(int argc, char *argv[])
 
     printf("\n---------------test openssl ctr--------------\n");
     // const unsigned char text[XDSGX_BLOCK_SIZE] = {'O','P','E','N','S','S','L','_','C','T','R','_','T','E','S','T'};
-    const unsigned char *text = (const unsigned char *)sql ;
+    unsigned char *text = (unsigned char *)sql ;
 
     //Receive hexadecimal 128 bits key 
     unsigned const char enc_key[AES_KEY_SIZE+1] = "1234567812345678";
@@ -770,20 +602,19 @@ int SGX_CDECL main(int argc, char *argv[])
     printf("\n");
 
     printf("key = %s\n", enc_key);
-
-    printf("Init, state.ivec (hex mode): ");
+//--------------------------------------------------------------------------------------------------------------
+    printf("Init, state.ivec (hex mode):");
     for(int i=0; i<AES_BLOCK_SIZE; i++){
         printf("%02x ", state.ivec[i]);
     }
     printf("\n");
 
-    cipher = TextEncrypt(enc_key, (const unsigned char *)text,len);
-    // int cipher_len = strlen((const char*)cipher);
-    // printf("cipher_len = %d\n", cipher_len);
+    cipher = TextEncrypt(enc_key, (unsigned char *)text,len);
+// int cipher_len = strlen((const char*)cipher);
+// printf("cipher_len = %d\n", cipher_len);
     printf("cipher:%02x\n", cipher);
-
 //FOR state.ecount
-    //ivec, ecount_buf, key
+//ivec, ecount_buf, key
     printf("\n------START test state.ecount------\n");
     unsigned char myout[XDSGX_BLOCK_SIZE];
     printf("\tBefore state.ecount (hex mode): ");
@@ -797,7 +628,7 @@ int SGX_CDECL main(int argc, char *argv[])
     }
     printf("\n");
     //AES_encrypt(state.ecount, myout, &key);
-    AES_decrypt(state.ecount, myout, &dec_key);
+    aes_decrypt(enc_key,state.ecount,myout);
     printf("\tAfter state.ecount (hex mode): ");
     for(int i=0; i<len; i++){
         printf("%02x ", myout[i]);
@@ -818,8 +649,8 @@ int SGX_CDECL main(int argc, char *argv[])
     }
     printf("\n");
 
-    //decrypted = TextDecrypt(enc_key, cipher,len);
-    //printf("openssl Decrypted text: %.*s\n", len, decrypted);
+//decrypted = TextDecrypt(enc_key, cipher,len);
+//printf("openssl Decrypted text: %.*s\n", len, decrypted);
 //state.ecount  //state.ivec
 
     if ( (ret = ecall_transfer_cipher(global_eid, enc_key, cipher, state.ivec, len))
@@ -857,7 +688,7 @@ int SGX_CDECL main(int argc, char *argv[])
     fprintf(stdout,"---test sgx_ctr_encrypt\n");
 
     const char sgx_ctr_key[16] = "1234567812345678";
-    const char* sgx_text = sql;
+    char* sgx_text = sql;
 
     int s_len = strlen(sgx_text);
     unsigned char * SGXcipher = (unsigned char *)malloc(16*sizeof(char));
@@ -895,27 +726,6 @@ int SGX_CDECL main(int argc, char *argv[])
         printf("sgx_ctr_encrypt is not equal\n");
     }
 
-    // fprintf(stdout,"\n---test sgx_ctr_decrypt\n");
-
-    // SGXcipher = TextEncrypt((const unsigned char *)sgx_ctr_key, (const unsigned char *)sgx_text,s_len);
-
-    // printf("cipher text: ");
-    // for(int i=0; i<16; i++){
-    //     printf("%02x ", SGXcipher[i]);
-    // }
-    // printf("\n");
-
-
-    // if ( (ret = ecall_sqlite3_ctr_decrypt(global_eid, &rc, dbname, (const char *)SGXcipher, sgx_ctr_key, SGXencrypted))
-    //         !=SGX_SUCCESS ){
-    //     printf("error");
-    // }
-
-    // printf("encrypted text: ");
-    // for(int i=0; i<s_len; i++){
-    //     printf("%02x ", SGXencrypted[i]);
-    // }
-    // printf("\n");
 
     fprintf(stdout,"---TEST SGX CTR END---\n\n");
 
@@ -958,6 +768,9 @@ int SGX_CDECL main(int argc, char *argv[])
     }
 fprintf(stdout, "\n-------run with get_table end-----------\n");
 #endif /* SGX_GET_TABLE_TEST */
+
+
+
 
     //sqlite3_close(db);
     if ( (ret = ecall_sqlite3_close(global_eid, &rc, &tdb))!= SGX_SUCCESS ) {
